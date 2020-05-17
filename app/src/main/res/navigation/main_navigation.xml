@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/moviesCollectionFragment"
-        android:name="net.olewinski.themoviedbbrowser.ui.screens.MoviesCollectionFragment"
+        android:name="net.olewinski.themoviedbbrowser.ui.screens.NowPlayingFragment"
         android:label="@string/app_name"
-        tools:layout="@layout/fragment_movies_collection">
+        tools:layout="@layout/fragment_now_playing">
 
         <action
             android:id="@+id/action_moviesCollectionFragment_to_movieDetailsFragment"
