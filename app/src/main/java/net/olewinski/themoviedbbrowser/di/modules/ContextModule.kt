@@ -10,5 +10,5 @@ class ContextModule(private val application: Application) {
 
     @Provides
     @ApplicationContext
-    fun getApplicationContext() = application.applicationContext
+    fun getApplicationContext() = application.applicationContext!!
 }
