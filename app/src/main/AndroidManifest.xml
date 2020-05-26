@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.olewinski.themoviedbbrowser">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:name=".application.TheMovieDbBrowserApplication"
         android:allowBackup="true"

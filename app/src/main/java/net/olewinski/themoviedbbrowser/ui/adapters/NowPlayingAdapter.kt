@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import net.olewinski.themoviedbbrowser.data.models.NowPlaying
 import net.olewinski.themoviedbbrowser.databinding.NowPlayingListItemBinding
 
-class NowPlayingAdapter :
+class NowPlayingAdapter(private val onNowPlayingItemClickedListener: (NowPlaying) -> Unit) :
     PagedListAdapter<NowPlaying, NowPlayingAdapter.NowPlayingItemViewHolder>(DIFF_CALLBACK) {
 
     interface OnNowPlayingItemClickedListener {
@@ -22,15 +22,13 @@ class NowPlayingAdapter :
                 item = nowPlaying
 
                 root.setOnClickListener {
-                    onNowPlayingItemClickedListener?.onNowPlayingItemClicked(nowPlaying)
+                    onNowPlayingItemClickedListener.invoke(nowPlaying)
                 }
 
                 executePendingBindings()
             }
         }
     }
-
-    var onNowPlayingItemClickedListener: OnNowPlayingItemClickedListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = NowPlayingItemViewHolder(
         NowPlayingListItemBinding.inflate(

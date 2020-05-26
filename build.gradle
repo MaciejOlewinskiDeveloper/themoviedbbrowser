@@ -8,6 +8,7 @@ buildscript {
         dagger_version = '2.27'
         gson_version = '2.8.6'
         retrofit_version = '2.6.4'
+        logging_interceptor_version = '3.12.0'
     }
 
     repositories {

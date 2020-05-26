@@ -15,7 +15,7 @@ interface TmdbService {
     suspend fun getNowPlaying(
         @Query("api_key") apiKey: String,
         @Query("language") language: String,
-        @Query("page") page: Int,
+        @Query("page") page: Long,
         @Query("region") region: String? = null
     ): Response<NowPlayingResults>
 }

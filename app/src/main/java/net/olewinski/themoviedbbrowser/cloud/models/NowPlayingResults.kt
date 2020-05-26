@@ -5,14 +5,14 @@ import net.olewinski.themoviedbbrowser.data.models.NowPlaying
 
 data class NowPlayingResults(
     @SerializedName("page")
-    val page: Int,
+    val page: Long,
 
     @SerializedName("results")
     val results: List<NowPlaying>,
 
     @SerializedName("total_pages")
-    val totalPages: Int,
+    val totalPages: Long,
 
     @SerializedName("total_results")
-    val totalResults: Int
+    val totalResults: Long
 )
