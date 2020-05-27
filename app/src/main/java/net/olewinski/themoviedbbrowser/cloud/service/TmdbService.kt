@@ -9,6 +9,10 @@ interface TmdbService {
     companion object {
         const val TMDB_ENDPOINT = "https://api.themoviedb.org/3/"
         const val TMDB_API_KEY = "5db23d1d4c860bb729176569f5d28780"
+
+        private const val IMAGES_BASE_URL = "https://image.tmdb.org/t/p/"
+
+        const val SMALL_POSTER_BASE_URL = "$IMAGES_BASE_URL/w154/"
     }
 
     @GET("movie/now_playing")

@@ -11,10 +11,6 @@ import net.olewinski.themoviedbbrowser.databinding.NowPlayingListItemBinding
 class NowPlayingAdapter(private val onNowPlayingItemClickedListener: (NowPlaying) -> Unit) :
     PagedListAdapter<NowPlaying, NowPlayingAdapter.NowPlayingItemViewHolder>(DIFF_CALLBACK) {
 
-    interface OnNowPlayingItemClickedListener {
-        fun onNowPlayingItemClicked(item: NowPlaying)
-    }
-
     inner class NowPlayingItemViewHolder(private val nowPlayingListItemBinding: NowPlayingListItemBinding) :
         RecyclerView.ViewHolder(nowPlayingListItemBinding.root) {
         fun bind(nowPlaying: NowPlaying) {
