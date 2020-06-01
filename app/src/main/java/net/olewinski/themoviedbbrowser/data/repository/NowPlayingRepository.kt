@@ -5,13 +5,18 @@ import androidx.paging.toLiveData
 import kotlinx.coroutines.CoroutineScope
 import net.olewinski.themoviedbbrowser.cloud.service.TmdbService
 import net.olewinski.themoviedbbrowser.data.PagedDataContainer
+import net.olewinski.themoviedbbrowser.data.db.TheMovieDbBrowserDatabase
 import net.olewinski.themoviedbbrowser.data.models.NowPlaying
 import net.olewinski.themoviedbbrowser.data.sources.NowPlayingDataSourceFactory
 import net.olewinski.themoviedbbrowser.di.scopes.ApplicationScope
 import javax.inject.Inject
 
 @ApplicationScope
-class NowPlayingRepository @Inject constructor(private val tmdbService: TmdbService) {
+class NowPlayingRepository @Inject constructor(
+    private val tmdbService: TmdbService,
+    private val theMovieDbBrowserDatabase: TheMovieDbBrowserDatabase
+) {
+    private val allFavouritesData = theMovieDbBrowserDatabase.getFavouritesDataDao().getAllFavouritesData()
 
     fun getNowPlayingData(coroutineScope: CoroutineScope): PagedDataContainer<NowPlaying> {
         val nowPlayingDataSourceFactory = NowPlayingDataSourceFactory(tmdbService, coroutineScope)
