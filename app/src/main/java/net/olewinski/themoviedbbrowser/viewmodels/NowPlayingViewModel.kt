@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import net.olewinski.themoviedbbrowser.data.repository.NowPlayingRepository
-import java.lang.Error
-import java.lang.RuntimeException
 
 class NowPlayingViewModel(nowPlayingRepository: NowPlayingRepository) : ViewModel() {
     private val nowPlayingData = nowPlayingRepository.getNowPlayingData(viewModelScope)

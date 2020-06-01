@@ -8,15 +8,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import dagger.Provides
 import net.olewinski.themoviedbbrowser.R
 import net.olewinski.themoviedbbrowser.application.TheMovieDbBrowserApplication
 import net.olewinski.themoviedbbrowser.cloud.NetworkDataLoadingState
-import net.olewinski.themoviedbbrowser.data.repository.NowPlayingRepository
 import net.olewinski.themoviedbbrowser.databinding.FragmentNowPlayingBinding
 import net.olewinski.themoviedbbrowser.ui.adapters.NowPlayingAdapter
 import net.olewinski.themoviedbbrowser.viewmodels.NowPlayingViewModel
-import java.lang.RuntimeException
 
 class NowPlayingFragment : Fragment() {
 
