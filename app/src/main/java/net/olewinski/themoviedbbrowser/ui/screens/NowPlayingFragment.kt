@@ -1,9 +1,7 @@
 package net.olewinski.themoviedbbrowser.ui.screens
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -11,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.Provides
+import net.olewinski.themoviedbbrowser.R
 import net.olewinski.themoviedbbrowser.application.TheMovieDbBrowserApplication
 import net.olewinski.themoviedbbrowser.cloud.NetworkDataLoadingState
 import net.olewinski.themoviedbbrowser.data.repository.NowPlayingRepository
@@ -28,6 +27,8 @@ class NowPlayingFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setHasOptionsMenu(true)
 
         nowPlayingViewModel = activity?.let { activity ->
             ViewModelProvider(
@@ -64,8 +65,27 @@ class NowPlayingFragment : Fragment() {
         nowPlayingViewModel.refreshState.observe(viewLifecycleOwner, Observer {
             nowPlayingBinding.swipeToRefresh.isRefreshing = it == NetworkDataLoadingState.LOADING
         })
+
         nowPlayingBinding.swipeToRefresh.setOnRefreshListener {
             nowPlayingViewModel.refresh()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.now_playing_list_menu, menu)
+
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId) {
+        R.id.refresh_item -> {
+            nowPlayingViewModel.refresh()
+
+            true
+        }
+
+        else -> {
+            false
         }
     }
 }
