@@ -1,7 +1,12 @@
 package net.olewinski.themoviedbbrowser.ui.screens
 
+import android.app.SearchManager
+import android.database.Cursor
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.widget.SearchView
+import androidx.cursoradapter.widget.CursorAdapter
+import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -35,7 +40,11 @@ class NowPlayingFragment : Fragment() {
         } ?: throw RuntimeException("Lack of Activity!")
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         nowPlayingBinding = FragmentNowPlayingBinding.inflate(inflater, container, false)
         nowPlayingBinding.lifecycleOwner = viewLifecycleOwner
 
@@ -46,7 +55,11 @@ class NowPlayingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         nowPlayingAdapter = NowPlayingAdapter { item ->
-            findNavController().navigate(NowPlayingFragmentDirections.actionMoviesCollectionFragmentToMovieDetailsFragment(item.id))
+            findNavController().navigate(
+                NowPlayingFragmentDirections.actionMoviesCollectionFragmentToMovieDetailsFragment(
+                    item.id
+                )
+            )
         }
 
         nowPlayingBinding.nowPlayingList.apply {
@@ -71,10 +84,12 @@ class NowPlayingFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.now_playing_list_menu, menu)
 
+        initSearchItem(menu.findItem(R.id.search_item).actionView as SearchView)
+
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.refresh_item -> {
             nowPlayingViewModel.refresh()
 
@@ -84,5 +99,63 @@ class NowPlayingFragment : Fragment() {
         else -> {
             false
         }
+    }
+
+    private fun initSearchItem(searchView: SearchView) {
+        val simpleCursorAdapter = SimpleCursorAdapter(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            null,
+            arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1),
+            intArrayOf(android.R.id.text1),
+            CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER
+        )
+
+        searchView.apply {
+            suggestionsAdapter = simpleCursorAdapter
+            isSubmitButtonEnabled = true
+
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    nowPlayingViewModel.requestSearchSuggestionsUpdate(newText)
+
+                    return true
+                }
+
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    nowPlayingViewModel.searchMovies(query)
+
+                    return true
+                }
+            })
+
+            setOnSuggestionListener(object : SearchView.OnSuggestionListener {
+                override fun onSuggestionSelect(position: Int) = false
+
+                override fun onSuggestionClick(position: Int): Boolean {
+                    val cursor = suggestionsAdapter.getItem(position) as Cursor
+                    val selection =
+                        cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1))
+
+                    setQuery(selection, false)
+
+                    return true
+                }
+            })
+
+            setOnCloseListener {
+                nowPlayingViewModel.showNowPlaying()
+                false
+            }
+        }
+
+        nowPlayingViewModel.searchSuggestions.observe(
+            viewLifecycleOwner,
+            Observer { searchSuggestions ->
+                searchView.suggestionsAdapter.apply {
+                    changeCursor(searchSuggestions)
+                    notifyDataSetChanged()
+                }
+            })
     }
 }

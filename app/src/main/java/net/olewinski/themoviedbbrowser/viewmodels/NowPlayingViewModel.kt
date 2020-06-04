@@ -1,27 +1,107 @@
 package net.olewinski.themoviedbbrowser.viewmodels
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import android.app.SearchManager
+import android.database.Cursor
+import android.database.MatrixCursor
+import android.provider.BaseColumns
+import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import net.olewinski.themoviedbbrowser.data.repository.MovieSearchRepository
 import net.olewinski.themoviedbbrowser.data.repository.NowPlayingRepository
 
-class NowPlayingViewModel(nowPlayingRepository: NowPlayingRepository) : ViewModel() {
-    private val nowPlayingData = nowPlayingRepository.getNowPlayingData(viewModelScope)
+const val AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD = 3
 
-    val pagedData = nowPlayingData.pagedData
-    val networkState = nowPlayingData.networkState
-    val refreshState = nowPlayingData.refreshState
+class NowPlayingViewModel(
+    nowPlayingRepository: NowPlayingRepository,
+    private val movieSearchRepository: MovieSearchRepository
+) : ViewModel() {
+    private val mutableSearchSuggestions = MutableLiveData<Cursor>()
+    val searchSuggestions: LiveData<Cursor> = mutableSearchSuggestions
 
-    fun refresh() {
-        nowPlayingData.refreshDataOperation.invoke()
+    private var fetchSearchSuggestionsOperation: Job? = null
+
+    private val currentSearchQuery = MutableLiveData<String?>().apply {
+        value = null
     }
 
-    class NowPlayingViewModelFactory(private val nowPlayingRepository: NowPlayingRepository) :
-        ViewModelProvider.NewInstanceFactory() {
+    private val moviesData = Transformations.map(currentSearchQuery) { searchQuery ->
+        if (searchQuery.isNullOrBlank()) {
+            nowPlayingRepository.getNowPlayingData(viewModelScope)
+        } else {
+            // TODO add search functionality on Repository level
+            nowPlayingRepository.getNowPlayingData(viewModelScope)
+        }
+    }
+
+    val pagedData = Transformations.switchMap(moviesData) { value ->
+        value.pagedData
+    }
+
+    val networkState = Transformations.switchMap(moviesData) { value ->
+        value.networkState
+    }
+
+    val refreshState = Transformations.switchMap(moviesData) { value ->
+        value.refreshState
+    }
+
+    fun refresh() {
+        moviesData.value?.refreshDataOperation?.invoke()
+    }
+
+    fun requestSearchSuggestionsUpdate(searchQuery: String?) {
+        // Cleaning previous search suggestions by setting empty cursor
+        mutableSearchSuggestions.value =
+            MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1), 0)
+
+        // Stopping any pending fetch suggestions operation
+        fetchSearchSuggestionsOperation?.cancel()
+        fetchSearchSuggestionsOperation = null
+
+        if (!searchQuery.isNullOrBlank() && searchQuery.length > AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD) {
+            fetchSearchSuggestionsOperation = viewModelScope.launch {
+                val newSearchSuggestions = movieSearchRepository.getSearchSuggestions(searchQuery)
+
+                val matrixCursor = MatrixCursor(
+                    arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1),
+                    newSearchSuggestions.size
+                )
+
+                // Computation
+                withContext(Dispatchers.Default) {
+                    newSearchSuggestions.forEachIndexed { id, searchSuggestion ->
+                        matrixCursor.newRow()
+                            .add(BaseColumns._ID, id)
+                            .add(SearchManager.SUGGEST_COLUMN_TEXT_1, searchSuggestion)
+                    }
+                }
+
+                mutableSearchSuggestions.value = matrixCursor
+            }
+        }
+    }
+
+    fun searchMovies(searchQuery: String?) {
+        currentSearchQuery.value = searchQuery
+    }
+
+    fun showNowPlaying() {
+        if (currentSearchQuery.value != null) {
+            currentSearchQuery.value = null
+        }
+    }
+
+    class NowPlayingViewModelFactory(
+        private val nowPlayingRepository: NowPlayingRepository,
+        private val movieSearchRepository: MovieSearchRepository
+    ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(NowPlayingViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return NowPlayingViewModel(nowPlayingRepository) as T
+                return NowPlayingViewModel(nowPlayingRepository, movieSearchRepository) as T
             } else {
                 throw Error("Incorrect ViewModel requested: only NowPlayingViewModel can be provided here")
             }

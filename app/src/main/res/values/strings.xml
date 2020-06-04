@@ -4,4 +4,5 @@
     <!-- Now Playing List's menu -->
     <string name="now_playing_list_menu_refresh_item_label">Refresh list</string>
     <string name="poster_content_description">Movie\'s poster</string>
+    <string name="now_playing_list_menu_search_item_label">Search for movies</string>
 </resources>
