@@ -3,7 +3,6 @@ package net.olewinski.themoviedbbrowser.ui.screens
 import android.app.SearchManager
 import android.database.Cursor
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.CursorAdapter

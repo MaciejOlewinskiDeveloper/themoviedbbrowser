@@ -3,6 +3,10 @@
 
     <!-- Now Playing List's menu -->
     <string name="now_playing_list_menu_refresh_item_label">Refresh list</string>
-    <string name="poster_content_description">Movie\'s poster</string>
     <string name="now_playing_list_menu_search_item_label">Search for movies</string>
+
+    <!-- Accessibility -->
+    <string name="poster_content_description">Movie\'s poster</string>
+    <string name="favourite_status_enabled_content_description">Enabled movie\'s favourite status toggle</string>
+    <string name="favourite_status_disabled_content_description">Disabled movie\'s favourite status toggle</string>
 </resources>

@@ -4,16 +4,12 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.olewinski.themoviedbbrowser.cloud.service.TmdbService
-import net.olewinski.themoviedbbrowser.data.db.TheMovieDbBrowserDatabase
 import net.olewinski.themoviedbbrowser.di.scopes.ApplicationScope
 import java.util.*
 import javax.inject.Inject
 
 @ApplicationScope
-class MovieSearchRepository @Inject constructor(
-    private val tmdbService: TmdbService,
-    private val theMovieDbBrowserDatabase: TheMovieDbBrowserDatabase
-) {
+class MovieSearchRepository @Inject constructor(private val tmdbService: TmdbService) {
     companion object {
         private val LOG_TAG = MovieSearchRepository::class.java.simpleName
     }
