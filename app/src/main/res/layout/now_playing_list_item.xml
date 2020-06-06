@@ -16,27 +16,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageButton
-            android:id="@+id/favourite_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@null"
-            android:src="@{item.favouriteStatus ? @drawable/ic_favourite_enabled_48 : @drawable/ic_favourite_disabled_48, default=@drawable/ic_favourite_disabled_48}"
-            android:contentDescription="@{item.favouriteStatus ? @string/favourite_status_enabled_content_description : @string/favourite_status_disabled_content_description, default=@string/favourite_status_disabled_content_description" />
-
         <ImageView
             android:id="@+id/poster"
             android:layout_width="64dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:padding="8dp"
             android:contentDescription="@string/poster_content_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -48,9 +32,7 @@
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
             android:text="@{item.title}"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             app:layout_constraintEnd_toStartOf="@+id/favourite_status"
@@ -62,8 +44,6 @@
             android:id="@+id/original_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
             android:text="@{item.originalTitle}"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:visibility="@{item.title.equals(item.originalTitle) ? View.INVISIBLE : View.VISIBLE}"
@@ -76,8 +56,6 @@
             android:id="@+id/release_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:text="@{item.releaseDate}"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -86,5 +64,17 @@
             app:layout_constraintTop_toBottomOf="@id/original_title"
             app:layout_constraintVertical_bias="1.0"
             tools:text="Debug release date" />
+
+        <ImageButton
+            android:id="@+id/favourite_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@null"
+            android:src="@{item.favouriteStatus ? @drawable/ic_favourite_enabled_48 : @drawable/ic_favourite_disabled_48, default=@drawable/ic_favourite_disabled_48}"
+            android:contentDescription="@{item.favouriteStatus ? @string/favourite_status_enabled_content_description : @string/favourite_status_disabled_content_description, default=@string/favourite_status_disabled_content_description" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
