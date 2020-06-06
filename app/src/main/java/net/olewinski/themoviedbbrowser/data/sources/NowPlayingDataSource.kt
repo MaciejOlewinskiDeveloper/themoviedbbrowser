@@ -10,7 +10,6 @@ import kotlinx.coroutines.withContext
 import net.olewinski.themoviedbbrowser.cloud.NetworkDataLoadingState
 import net.olewinski.themoviedbbrowser.cloud.service.TmdbService
 import net.olewinski.themoviedbbrowser.data.db.TheMovieDbBrowserDatabase
-import net.olewinski.themoviedbbrowser.data.db.entities.FavouritesData
 import net.olewinski.themoviedbbrowser.data.models.NowPlaying
 import java.util.*
 
@@ -20,7 +19,9 @@ class NowPlayingDataSource(
     private val coroutineScope: CoroutineScope
 ) : PageKeyedDataSource<Long, NowPlaying>() {
 
-    private val favouritesData = theMovieDbBrowserDatabase.getFavouritesDataDao().getAllFavouritesData()
+    private val favouritesMoviesIds = Transformations.map(theMovieDbBrowserDatabase.getFavouritesDataDao().getAllFavouritesMoviesIds()) { favouritesDataList ->
+        favouritesDataList.toHashSet()
+    }
 
     val initialNetworkDataLoadingState = MutableLiveData<NetworkDataLoadingState>()
     val networkDataLoadingState = MutableLiveData<NetworkDataLoadingState>()
@@ -134,8 +135,8 @@ class NowPlayingDataSource(
 
     private suspend fun enhanceResultsWithFavouriteData(results: List<NowPlaying>) = withContext(Dispatchers.IO) {
         results.forEach { nowPlaying: NowPlaying ->
-            nowPlaying.favouriteStatus = Transformations.map(favouritesData) { favouritesDataList ->
-                favouritesDataList.contains(FavouritesData(nowPlaying.id))
+            nowPlaying.favouriteStatus = Transformations.map(favouritesMoviesIds) { favouritesMoviesIdsSet ->
+                favouritesMoviesIdsSet.contains(nowPlaying.id)
             }
         }
     }

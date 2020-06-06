@@ -18,7 +18,7 @@ class NowPlayingRepository @Inject constructor(
     private val theMovieDbBrowserDatabase: TheMovieDbBrowserDatabase
 ) {
     suspend fun toggleFavouriteData(nowPlaying: NowPlaying) {
-        theMovieDbBrowserDatabase.getFavouritesDataDao().toggleDataPresence(nowPlaying.id)
+        theMovieDbBrowserDatabase.getFavouritesDataDao().toggleFavouritesDataPresenceForMovie(nowPlaying.id)
     }
 
     fun getNowPlayingData(coroutineScope: CoroutineScope): PagedDataContainer<NowPlaying> {

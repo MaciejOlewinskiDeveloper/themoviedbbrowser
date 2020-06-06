@@ -14,18 +14,18 @@ interface FavouritesDataDao {
     @Delete
     suspend fun delete(favouritesData: FavouritesData)
 
-    @Query("SELECT * FROM $FAVOURITES_DATA_ENTITY_TABLE_NAME")
-    fun getAllFavouritesData(): LiveData<List<FavouritesData>>
+    @Query("SELECT $FAVOURITES_DATA_ENTITY_MOVIE_ID_COLUMN_NAME FROM $FAVOURITES_DATA_ENTITY_TABLE_NAME")
+    fun getAllFavouritesMoviesIds(): LiveData<List<Long>>
 
-    @Query("SELECT * FROM $FAVOURITES_DATA_ENTITY_TABLE_NAME WHERE $FAVOURITES_DATA_ENTITY_MOVIE_ID_COLUMN_NAME=:movieId LIMIT 1")
-    suspend fun getFavouritesDataForMovie(movieId: Long): FavouritesData?
+    @Query("SELECT COUNT(*) FROM $FAVOURITES_DATA_ENTITY_TABLE_NAME WHERE $FAVOURITES_DATA_ENTITY_MOVIE_ID_COLUMN_NAME=:movieId")
+    suspend fun countDataItemsForMovieId(movieId: Long): Long
 
     @Transaction
-    suspend fun toggleDataPresence(movieId: Long) {
-        if (getFavouritesDataForMovie(movieId) == null) {
-            insert(FavouritesData(movieId))
-        } else {
+    suspend fun toggleFavouritesDataPresenceForMovie(movieId: Long) {
+        if (countDataItemsForMovieId(movieId) > 0L) {
             delete((FavouritesData(movieId)))
+        } else {
+            insert(FavouritesData(movieId))
         }
     }
 }
