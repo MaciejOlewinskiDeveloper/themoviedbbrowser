@@ -25,6 +25,8 @@ class NowPlayingViewModel(
         value = null
     }
 
+    var lastTypedSearchQuery: String? = null
+
     private val moviesData = Transformations.map(currentSearchQuery) { searchQuery ->
         if (searchQuery.isNullOrBlank()) {
             nowPlayingRepository.getNowPlayingData(viewModelScope)
@@ -50,6 +52,8 @@ class NowPlayingViewModel(
     }
 
     fun requestSearchSuggestionsUpdate(searchQuery: String?) {
+        lastTypedSearchQuery = searchQuery
+
         // Cleaning previous search suggestions by setting empty cursor
         mutableSearchSuggestions.value =
             MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1), 0)
@@ -82,13 +86,13 @@ class NowPlayingViewModel(
     }
 
     fun searchMovies(searchQuery: String?) {
+        lastTypedSearchQuery = searchQuery
         currentSearchQuery.value = searchQuery
     }
 
     fun showNowPlaying() {
-        if (currentSearchQuery.value != null) {
-            currentSearchQuery.value = null
-        }
+        lastTypedSearchQuery = null
+        currentSearchQuery.value = null
     }
 
     fun onItemFavouriteToggleClicked(nowPlaying: NowPlaying) {

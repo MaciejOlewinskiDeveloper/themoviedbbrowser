@@ -113,6 +113,11 @@ class NowPlayingFragment : Fragment() {
             CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER
         )
 
+        nowPlayingViewModel.lastTypedSearchQuery?.also { currentSearchQuery ->
+            searchView.isIconified = false
+            searchView.setQuery(currentSearchQuery, false);
+        }
+
         searchView.apply {
             suggestionsAdapter = simpleCursorAdapter
             isSubmitButtonEnabled = true
