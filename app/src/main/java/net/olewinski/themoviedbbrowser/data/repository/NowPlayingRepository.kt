@@ -8,6 +8,7 @@ import net.olewinski.themoviedbbrowser.data.PagedDataContainer
 import net.olewinski.themoviedbbrowser.data.db.TheMovieDbBrowserDatabase
 import net.olewinski.themoviedbbrowser.data.models.NowPlaying
 import net.olewinski.themoviedbbrowser.data.sources.NowPlayingDataSourceFactory
+import net.olewinski.themoviedbbrowser.data.sources.SearchMoviesDataSourceFactory
 import net.olewinski.themoviedbbrowser.di.scopes.ApplicationScope
 import javax.inject.Inject
 
@@ -34,6 +35,26 @@ class NowPlayingRepository @Inject constructor(
             },
             refreshState = Transformations.switchMap(nowPlayingDataSourceFactory.nowPlayingDataSource) { nowPlayingDataSource ->
                 nowPlayingDataSource.initialNetworkDataLoadingState
+            }
+        )
+    }
+
+    fun searchMovies(coroutineScope: CoroutineScope, searchQuery: String): PagedDataContainer<NowPlaying> {
+        val searchMoviesDataSourceFactory = SearchMoviesDataSourceFactory(tmdbService, coroutineScope, searchQuery)
+
+        return PagedDataContainer(
+            pagedData = searchMoviesDataSourceFactory.toLiveData(32),
+            networkState = Transformations.switchMap(searchMoviesDataSourceFactory.searchMoviesDataSource) { searchMoviesDataSource ->
+                searchMoviesDataSource.networkDataLoadingState
+            },
+            retryOperation = {
+                searchMoviesDataSourceFactory.searchMoviesDataSource.value?.retryAllFailed()
+            },
+            refreshDataOperation = {
+                searchMoviesDataSourceFactory.searchMoviesDataSource.value?.invalidate()
+            },
+            refreshState = Transformations.switchMap(searchMoviesDataSourceFactory.searchMoviesDataSource) { searchMoviesDataSource ->
+                searchMoviesDataSource.initialNetworkDataLoadingState
             }
         )
     }

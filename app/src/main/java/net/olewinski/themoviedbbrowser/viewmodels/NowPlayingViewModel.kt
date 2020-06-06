@@ -12,7 +12,7 @@ import kotlinx.coroutines.withContext
 import net.olewinski.themoviedbbrowser.data.repository.MovieSearchRepository
 import net.olewinski.themoviedbbrowser.data.repository.NowPlayingRepository
 
-const val AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD = 3
+const val AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD = 2
 
 class NowPlayingViewModel(
     nowPlayingRepository: NowPlayingRepository,
@@ -31,8 +31,7 @@ class NowPlayingViewModel(
         if (searchQuery.isNullOrBlank()) {
             nowPlayingRepository.getNowPlayingData(viewModelScope)
         } else {
-            // TODO add search functionality on Repository level
-            nowPlayingRepository.getNowPlayingData(viewModelScope)
+            nowPlayingRepository.searchMovies(viewModelScope, searchQuery)
         }
     }
 
