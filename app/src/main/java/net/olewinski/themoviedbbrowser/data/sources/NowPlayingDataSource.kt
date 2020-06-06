@@ -1,19 +1,26 @@
 package net.olewinski.themoviedbbrowser.data.sources
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.paging.PageKeyedDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.olewinski.themoviedbbrowser.cloud.NetworkDataLoadingState
 import net.olewinski.themoviedbbrowser.cloud.service.TmdbService
+import net.olewinski.themoviedbbrowser.data.db.TheMovieDbBrowserDatabase
+import net.olewinski.themoviedbbrowser.data.db.entities.FavouritesData
 import net.olewinski.themoviedbbrowser.data.models.NowPlaying
 import java.util.*
 
 class NowPlayingDataSource(
     private val tmdbService: TmdbService,
+    theMovieDbBrowserDatabase: TheMovieDbBrowserDatabase,
     private val coroutineScope: CoroutineScope
 ) : PageKeyedDataSource<Long, NowPlaying>() {
+
+    private val favouritesData = theMovieDbBrowserDatabase.getFavouritesDataDao().getAllFavouritesData()
 
     val initialNetworkDataLoadingState = MutableLiveData<NetworkDataLoadingState>()
     val networkDataLoadingState = MutableLiveData<NetworkDataLoadingState>()
@@ -42,6 +49,8 @@ class NowPlayingDataSource(
                     val nextKey = response.body()?.totalPages?.let { totalPages ->
                         if (totalPages > 1L) 2L else null
                     }
+
+                    enhanceResultsWithFavouriteData(results)
 
                     initialNetworkDataLoadingState.postValue(NetworkDataLoadingState.READY)
                     networkDataLoadingState.postValue(NetworkDataLoadingState.READY)
@@ -85,6 +94,8 @@ class NowPlayingDataSource(
                         if (params.key == totalPages) null else params.key + 1L
                     }
 
+                    enhanceResultsWithFavouriteData(results)
+
                     networkDataLoadingState.postValue(NetworkDataLoadingState.READY)
 
                     callback.onResult(results, nextKey)
@@ -114,9 +125,17 @@ class NowPlayingDataSource(
 
         retryOperation = null
 
-        previousRetryOperation?.let { previousRetryOperation ->
+        previousRetryOperation?.let { operation ->
             coroutineScope.launch(Dispatchers.IO) {
-                previousRetryOperation.invoke()
+                operation.invoke()
+            }
+        }
+    }
+
+    private suspend fun enhanceResultsWithFavouriteData(results: List<NowPlaying>) = withContext(Dispatchers.IO) {
+        results.forEach { nowPlaying: NowPlaying ->
+            nowPlaying.favouriteStatus = Transformations.map(favouritesData) { favouritesDataList ->
+                favouritesDataList.contains(FavouritesData(nowPlaying.id))
             }
         }
     }

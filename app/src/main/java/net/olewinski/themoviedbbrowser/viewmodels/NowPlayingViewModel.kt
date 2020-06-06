@@ -5,17 +5,15 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.provider.BaseColumns
 import androidx.lifecycle.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import net.olewinski.themoviedbbrowser.data.models.NowPlaying
 import net.olewinski.themoviedbbrowser.data.repository.MovieSearchRepository
 import net.olewinski.themoviedbbrowser.data.repository.NowPlayingRepository
 
 const val AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD = 2
 
 class NowPlayingViewModel(
-    nowPlayingRepository: NowPlayingRepository,
+    private val nowPlayingRepository: NowPlayingRepository,
     private val movieSearchRepository: MovieSearchRepository
 ) : ViewModel() {
     private val mutableSearchSuggestions = MutableLiveData<Cursor>()
@@ -90,6 +88,12 @@ class NowPlayingViewModel(
     fun showNowPlaying() {
         if (currentSearchQuery.value != null) {
             currentSearchQuery.value = null
+        }
+    }
+
+    fun onItemFavouriteToggleClicked(nowPlaying: NowPlaying) {
+        GlobalScope.launch {
+            nowPlayingRepository.toggleFavouriteData(nowPlaying)
         }
     }
 

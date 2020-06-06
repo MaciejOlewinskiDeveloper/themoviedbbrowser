@@ -17,10 +17,12 @@ class NowPlayingRepository @Inject constructor(
     private val tmdbService: TmdbService,
     private val theMovieDbBrowserDatabase: TheMovieDbBrowserDatabase
 ) {
-    private val allFavouritesData = theMovieDbBrowserDatabase.getFavouritesDataDao().getAllFavouritesData()
+    suspend fun toggleFavouriteData(nowPlaying: NowPlaying) {
+        theMovieDbBrowserDatabase.getFavouritesDataDao().toggleDataPresence(nowPlaying.id)
+    }
 
     fun getNowPlayingData(coroutineScope: CoroutineScope): PagedDataContainer<NowPlaying> {
-        val nowPlayingDataSourceFactory = NowPlayingDataSourceFactory(tmdbService, coroutineScope)
+        val nowPlayingDataSourceFactory = NowPlayingDataSourceFactory(tmdbService, theMovieDbBrowserDatabase, coroutineScope)
 
         return PagedDataContainer(
             pagedData = nowPlayingDataSourceFactory.toLiveData(32),
@@ -40,7 +42,7 @@ class NowPlayingRepository @Inject constructor(
     }
 
     fun searchMovies(coroutineScope: CoroutineScope, searchQuery: String): PagedDataContainer<NowPlaying> {
-        val searchMoviesDataSourceFactory = SearchMoviesDataSourceFactory(tmdbService, coroutineScope, searchQuery)
+        val searchMoviesDataSourceFactory = SearchMoviesDataSourceFactory(tmdbService, theMovieDbBrowserDatabase, coroutineScope, searchQuery)
 
         return PagedDataContainer(
             pagedData = searchMoviesDataSourceFactory.toLiveData(32),

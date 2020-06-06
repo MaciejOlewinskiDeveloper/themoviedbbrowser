@@ -3,6 +3,7 @@ package net.olewinski.themoviedbbrowser.ui.screens
 import android.app.SearchManager
 import android.database.Cursor
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.CursorAdapter
@@ -54,13 +55,15 @@ class NowPlayingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        nowPlayingAdapter = NowPlayingAdapter { item ->
+        nowPlayingAdapter = NowPlayingAdapter(viewLifecycleOwner, { item ->
             findNavController().navigate(
                 NowPlayingFragmentDirections.actionMoviesCollectionFragmentToMovieDetailsFragment(
                     item.id
                 )
             )
-        }
+        }, { item ->
+            nowPlayingViewModel.onItemFavouriteToggleClicked(item)
+        })
 
         nowPlayingBinding.nowPlayingList.apply {
             adapter = nowPlayingAdapter

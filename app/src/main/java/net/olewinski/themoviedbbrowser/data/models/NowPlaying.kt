@@ -1,5 +1,6 @@
 package net.olewinski.themoviedbbrowser.data.models
 
+import androidx.lifecycle.LiveData
 import com.google.gson.annotations.SerializedName
 
 data class NowPlaying(
@@ -16,5 +17,8 @@ data class NowPlaying(
     val releaseDate: String,
 
     @SerializedName("poster_path")
-    val posterPath: String
+    val posterPath: String,
+
+    @Transient
+    var favouriteStatus: LiveData<Boolean>
 )
