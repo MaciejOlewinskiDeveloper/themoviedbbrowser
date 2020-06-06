@@ -74,7 +74,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:background="@null"
-            android:src="@{item.favouriteStatus ? @drawable/ic_favourite_enabled_48 : @drawable/ic_favourite_disabled_48, default=@drawable/ic_favourite_disabled_48}"
+            app:srcCompat="@{item.favouriteStatus ? @drawable/ic_favourite_enabled_48 : @drawable/ic_favourite_disabled_48, default=@drawable/ic_favourite_disabled_48}"
             android:contentDescription="@{item.favouriteStatus ? @string/favourite_status_enabled_content_description : @string/favourite_status_disabled_content_description, default=@string/favourite_status_disabled_content_description" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
