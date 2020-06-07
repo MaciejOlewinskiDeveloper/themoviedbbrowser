@@ -14,6 +14,7 @@ interface TmdbService {
         private const val IMAGES_BASE_URL = "https://image.tmdb.org/t/p/"
 
         const val SMALL_POSTER_BASE_URL = "$IMAGES_BASE_URL/w154/"
+        const val MEDIUM_BACKDROP_BASE_URL = "$IMAGES_BASE_URL/w780/"
     }
 
     @GET("movie/now_playing")

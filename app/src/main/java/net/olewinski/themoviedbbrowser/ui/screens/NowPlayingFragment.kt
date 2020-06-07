@@ -19,6 +19,7 @@ import net.olewinski.themoviedbbrowser.cloud.NetworkDataLoadingState
 import net.olewinski.themoviedbbrowser.databinding.FragmentNowPlayingBinding
 import net.olewinski.themoviedbbrowser.ui.adapters.NowPlayingAdapter
 import net.olewinski.themoviedbbrowser.viewmodels.NowPlayingViewModel
+import net.olewinski.themoviedbbrowser.viewmodels.SelectedMovieViewModel
 
 class NowPlayingFragment : Fragment() {
 
@@ -26,17 +27,23 @@ class NowPlayingFragment : Fragment() {
     private lateinit var nowPlayingAdapter: NowPlayingAdapter
 
     private lateinit var nowPlayingViewModel: NowPlayingViewModel
+    private lateinit var selectedMovieViewModel: SelectedMovieViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setHasOptionsMenu(true)
 
-        nowPlayingViewModel = activity?.let { activity ->
-            ViewModelProvider(
+        activity?.let { activity ->
+            nowPlayingViewModel = ViewModelProvider(
                 viewModelStore,
                 (activity.applicationContext as TheMovieDbBrowserApplication).applicationComponent.getNowPlayingViewModelFactory()
             ).get(NowPlayingViewModel::class.java)
+
+            selectedMovieViewModel = ViewModelProvider(
+                activity.viewModelStore,
+                (activity.applicationContext as TheMovieDbBrowserApplication).applicationComponent.getSelectedMovieViewModelFactory()
+            ).get(SelectedMovieViewModel::class.java)
         } ?: throw RuntimeException("Lack of Activity!")
     }
 
@@ -55,6 +62,7 @@ class NowPlayingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         nowPlayingAdapter = NowPlayingAdapter(viewLifecycleOwner, { item ->
+            selectedMovieViewModel.selectMovie(item)
             findNavController().navigate(
                 NowPlayingFragmentDirections.actionMoviesCollectionFragmentToMovieDetailsFragment(
                     item.id
@@ -99,7 +107,7 @@ class NowPlayingFragment : Fragment() {
         }
 
         else -> {
-            false
+            super.onOptionsItemSelected(item)
         }
     }
 

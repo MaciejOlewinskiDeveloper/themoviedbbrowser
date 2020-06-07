@@ -1,16 +1,204 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <FrameLayout
+    <data>
+        <import type="android.view.View" />
+        <import type="net.olewinski.themoviedbbrowser.cloud.service.TmdbService" />
+
+        <variable
+            name="item"
+            type="net.olewinski.themoviedbbrowser.data.models.NowPlaying" />
+    </data>
+
+    <ScrollView
+        android:id="@+id/main_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.screens.MovieDetailsFragment">
+        android:fillViewport="true">
 
-        <TextView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Movie details fragment" />
+            android:layout_height="wrap_content">
 
-    </FrameLayout>
+            <ImageView
+                android:id="@+id/backdrop_image_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:imageUrl="@{TmdbService.MEDIUM_BACKDROP_BASE_URL + item.backdropPath}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/ic_image_black_256dp" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@android:color/white"
+                android:padding="8dp"
+                android:text="@{item.title}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:textColor="@android:color/black"
+                app:layout_constraintBottom_toTopOf="@+id/original_title"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="Debug Movie Title" />
+
+            <TextView
+                android:id="@+id/original_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@android:color/white"
+                android:padding="8dp"
+                android:text="@{item.originalTitle}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@android:color/black"
+                android:visibility="@{item.title.equals(item.originalTitle) ? View.GONE : View.VISIBLE}"
+                app:layout_constraintBottom_toBottomOf="@+id/backdrop_image_view"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="Debug Original Movie Title" />
+
+            <TextView
+                android:id="@+id/details_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/details_label"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/backdrop_image_view" />
+
+            <View
+                android:id="@+id/decorative_view_1"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@color/colorPrimary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/details_label" />
+
+            <TextView
+                android:id="@+id/release_date_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/release_date_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/decorative_view_1" />
+
+            <TextView
+                android:id="@+id/release_date_value"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@{item.releaseDate}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/release_date_average_rate_barrier"
+                app:layout_constraintTop_toBottomOf="@+id/decorative_view_1"
+                tools:text="01 JAN 2020" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/release_date_bottom_barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="release_date_label,release_date_value" />
+
+            <TextView
+                android:id="@+id/average_rate_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/average_rate_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/release_date_label" />
+
+            <TextView
+                android:id="@+id/average_rate_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text='@{String.format("%.1f", item.voteAverage)}'
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintEnd_toStartOf="@+id/votes_count_value"
+                app:layout_constraintStart_toEndOf="@+id/release_date_average_rate_barrier"
+                app:layout_constraintTop_toBottomOf="@+id/release_date_bottom_barrier"
+                tools:text="7.0" />
+
+            <TextView
+                android:id="@+id/votes_count_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@{@plurals/votes_count(item.voteCount, item.voteCount)}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/average_rate_value"
+                app:layout_constraintTop_toBottomOf="@+id/release_date_bottom_barrier"
+                tools:text="[1234 votes]" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/release_date_average_rate_barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="end"
+                app:constraint_referenced_ids="release_date_label,average_rate_label" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/average_rate_barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="average_rate_label,average_rate_value" />
+
+            <TextView
+                android:id="@+id/overview_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/overview_label"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/average_rate_barrier" />
+
+            <View
+                android:id="@+id/decorative_view_2"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@color/colorPrimary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/overview_label" />
+
+            <TextView
+                android:id="@+id/overview_content"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:paddingBottom="8dp"
+                android:text="@{item.overview}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/decorative_view_2"
+                tools:text="@string/lorem_ipsum" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </layout>

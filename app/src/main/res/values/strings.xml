@@ -9,4 +9,22 @@
     <string name="poster_content_description">Movie\'s poster</string>
     <string name="favourite_status_enabled_content_description">Enabled movie\'s favourite status toggle</string>
     <string name="favourite_status_disabled_content_description">Disabled movie\'s favourite status toggle</string>
+
+    <!-- Movie's details screen menu -->
+    <string name="favourite_menu_item_enable_label">Mark movie as your favourite</string>
+    <string name="favourite_menu_item_disable_label">Remove movie from your favourites</string>
+
+    <!-- Movie details screen texts -->
+    <string name="details_label">Basic details</string>
+    <string name="release_date_label">Release date:</string>
+    <string name="average_rate_label">Average rate:</string>
+    <string name="overview_label">Overview</string>
+
+    <plurals name="votes_count">
+        <item quantity="one">[%1$d vote]</item>
+        <item quantity="other">[%1$d votes]</item>
+    </plurals>
+
+    <!-- Debug strings -->
+    <string name="lorem_ipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quis massa mi. Sed vestibulum rutrum hendrerit. Donec non volutpat dui. Sed lobortis libero placerat nisl sodales dapibus. Nullam nibh sem, tristique imperdiet pharetra sit amet, dapibus ac justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed quam neque, posuere sit amet condimentum sit amet, venenatis eu libero. Suspendisse vel condimentum odio. Nunc volutpat mollis felis nec pulvinar. Donec tempor augue ac sollicitudin venenatis.</string>
 </resources>
