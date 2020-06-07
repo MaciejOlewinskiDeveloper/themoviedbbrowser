@@ -79,6 +79,8 @@ class NowPlayingFragment : Fragment() {
             nowPlayingViewModel.onItemClicked(item)
         }, { item ->
             nowPlayingViewModel.onItemFavouriteToggleClicked(item)
+        }, {
+            nowPlayingViewModel.retry()
         })
 
         nowPlayingBinding.nowPlayingList.apply {
@@ -89,6 +91,10 @@ class NowPlayingFragment : Fragment() {
 
         nowPlayingViewModel.pagedData.observe(viewLifecycleOwner, Observer {
             nowPlayingAdapter.submitList(it)
+        })
+
+        nowPlayingViewModel.networkState.observe(viewLifecycleOwner, Observer {
+            nowPlayingAdapter.updateNetworkState(it)
         })
 
         nowPlayingViewModel.refreshState.observe(viewLifecycleOwner, Observer {

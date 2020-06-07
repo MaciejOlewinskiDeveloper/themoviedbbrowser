@@ -25,6 +25,9 @@
         <item quantity="other">[%1$d votes]</item>
     </plurals>
 
+    <!-- Miscellaneous -->
+    <string name="retry_button_label">Retry</string>
+
     <!-- Debug strings -->
     <string name="lorem_ipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quis massa mi. Sed vestibulum rutrum hendrerit. Donec non volutpat dui. Sed lobortis libero placerat nisl sodales dapibus. Nullam nibh sem, tristique imperdiet pharetra sit amet, dapibus ac justo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed quam neque, posuere sit amet condimentum sit amet, venenatis eu libero. Suspendisse vel condimentum odio. Nunc volutpat mollis felis nec pulvinar. Donec tempor augue ac sollicitudin venenatis.</string>
 </resources>

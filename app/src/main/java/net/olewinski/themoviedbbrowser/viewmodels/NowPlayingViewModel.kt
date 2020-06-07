@@ -112,6 +112,10 @@ class NowPlayingViewModel(
         }
     }
 
+    fun retry() {
+        moviesData.value?.retryOperation?.invoke()
+    }
+
     class NowPlayingViewModelFactory(
         private val nowPlayingRepository: NowPlayingRepository,
         private val movieSearchRepository: MovieSearchRepository
