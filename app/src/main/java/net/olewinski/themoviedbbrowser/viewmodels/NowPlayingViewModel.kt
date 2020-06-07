@@ -9,13 +9,20 @@ import kotlinx.coroutines.*
 import net.olewinski.themoviedbbrowser.data.models.NowPlaying
 import net.olewinski.themoviedbbrowser.data.repository.MovieSearchRepository
 import net.olewinski.themoviedbbrowser.data.repository.NowPlayingRepository
+import net.olewinski.themoviedbbrowser.util.OneTimeEvent
 
 const val AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD = 2
+
+sealed class NavigationRequest
+class MovieDetailsNavigationRequest(val nowPlaying: NowPlaying) : NavigationRequest()
 
 class NowPlayingViewModel(
     private val nowPlayingRepository: NowPlayingRepository,
     private val movieSearchRepository: MovieSearchRepository
 ) : ViewModel() {
+    private val mutableNavigationRequest = MutableLiveData<OneTimeEvent<NavigationRequest>>()
+    val navigationRequest: LiveData<OneTimeEvent<NavigationRequest>> = mutableNavigationRequest
+
     private val mutableSearchSuggestions = MutableLiveData<Cursor>()
     val searchSuggestions: LiveData<Cursor> = mutableSearchSuggestions
 
@@ -93,6 +100,10 @@ class NowPlayingViewModel(
     fun showNowPlaying() {
         lastTypedSearchQuery = null
         currentSearchQuery.value = null
+    }
+
+    fun onItemClicked(nowPlaying: NowPlaying) {
+        mutableNavigationRequest.value = OneTimeEvent(MovieDetailsNavigationRequest(nowPlaying))
     }
 
     fun onItemFavouriteToggleClicked(nowPlaying: NowPlaying) {

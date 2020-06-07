@@ -18,6 +18,7 @@ import net.olewinski.themoviedbbrowser.application.TheMovieDbBrowserApplication
 import net.olewinski.themoviedbbrowser.cloud.NetworkDataLoadingState
 import net.olewinski.themoviedbbrowser.databinding.FragmentNowPlayingBinding
 import net.olewinski.themoviedbbrowser.ui.adapters.NowPlayingAdapter
+import net.olewinski.themoviedbbrowser.viewmodels.MovieDetailsNavigationRequest
 import net.olewinski.themoviedbbrowser.viewmodels.NowPlayingViewModel
 import net.olewinski.themoviedbbrowser.viewmodels.SelectedMovieViewModel
 
@@ -61,13 +62,21 @@ class NowPlayingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        nowPlayingViewModel.navigationRequest.observe(
+            viewLifecycleOwner,
+            Observer { navigationRequestOneTimeEvent ->
+                navigationRequestOneTimeEvent.getContent()?.let { navigationRequest ->
+                    when (navigationRequest) {
+                        is MovieDetailsNavigationRequest -> {
+                            selectedMovieViewModel.selectMovie(navigationRequest.nowPlaying)
+                            findNavController().navigate(NowPlayingFragmentDirections.actionMoviesCollectionFragmentToMovieDetailsFragment())
+                        }
+                    }
+                }
+            })
+
         nowPlayingAdapter = NowPlayingAdapter(viewLifecycleOwner, { item ->
-            selectedMovieViewModel.selectMovie(item)
-            findNavController().navigate(
-                NowPlayingFragmentDirections.actionMoviesCollectionFragmentToMovieDetailsFragment(
-                    item.id
-                )
-            )
+            nowPlayingViewModel.onItemClicked(item)
         }, { item ->
             nowPlayingViewModel.onItemFavouriteToggleClicked(item)
         })

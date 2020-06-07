@@ -20,10 +20,5 @@
         android:id="@+id/movieDetailsFragment"
         android:name="net.olewinski.themoviedbbrowser.ui.screens.MovieDetailsFragment"
         android:label="fragment_movie_details"
-        tools:layout="@layout/fragment_movie_details">
-
-        <argument
-            android:name="movieId"
-            app:argType="long" />
-    </fragment>
+        tools:layout="@layout/fragment_movie_details"/>
 </navigation>
