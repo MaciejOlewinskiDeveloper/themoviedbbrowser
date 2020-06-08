@@ -38,7 +38,7 @@ class MoviesListFragment : Fragment() {
         activity?.let { activity ->
             moviesListViewModel = ViewModelProvider(
                 viewModelStore,
-                (activity.applicationContext as TheMovieDbBrowserApplication).applicationComponent.getNowPlayingViewModelFactory()
+                (activity.applicationContext as TheMovieDbBrowserApplication).applicationComponent.getMoviesListViewModelFactory()
             ).get(MoviesListViewModel::class.java)
 
             selectedMovieViewModel = ViewModelProvider(

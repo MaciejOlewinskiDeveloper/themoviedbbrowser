@@ -17,7 +17,7 @@ interface ApplicationComponent {
     @ApplicationContext
     fun getApplicationContext(): Context
 
-    fun getNowPlayingViewModelFactory(): MoviesListViewModel.MoviesListViewModelFactory
+    fun getMoviesListViewModelFactory(): MoviesListViewModel.MoviesListViewModelFactory
 
     fun getSelectedMovieViewModelFactory(): SelectedMovieViewModel.SelectedMovieViewModelFactory
 }
