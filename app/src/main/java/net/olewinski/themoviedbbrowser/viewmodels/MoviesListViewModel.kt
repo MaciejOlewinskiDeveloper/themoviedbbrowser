@@ -7,7 +7,6 @@ import android.provider.BaseColumns
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import net.olewinski.themoviedbbrowser.data.models.MovieData
-import net.olewinski.themoviedbbrowser.data.repository.MovieSearchRepository
 import net.olewinski.themoviedbbrowser.data.repository.MoviesRepository
 import net.olewinski.themoviedbbrowser.util.OneTimeEvent
 
@@ -16,10 +15,7 @@ const val AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD = 2
 sealed class NavigationRequest
 class MovieDetailsNavigationRequest(val movieData: MovieData) : NavigationRequest()
 
-class MoviesListViewModel(
-    private val moviesRepository: MoviesRepository,
-    private val movieSearchRepository: MovieSearchRepository
-) : ViewModel() {
+class MoviesListViewModel(private val moviesRepository: MoviesRepository) : ViewModel() {
     private val mutableNavigationRequest = MutableLiveData<OneTimeEvent<NavigationRequest>>()
     val navigationRequest: LiveData<OneTimeEvent<NavigationRequest>> = mutableNavigationRequest
 
@@ -71,7 +67,7 @@ class MoviesListViewModel(
 
         if (!searchQuery.isNullOrBlank() && searchQuery.length > AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD) {
             fetchSearchSuggestionsOperation = viewModelScope.launch {
-                val newSearchSuggestions = movieSearchRepository.getSearchSuggestions(searchQuery)
+                val newSearchSuggestions = moviesRepository.getSearchSuggestions(searchQuery)
 
                 val matrixCursor = MatrixCursor(
                     arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1),
@@ -116,14 +112,12 @@ class MoviesListViewModel(
         moviesData.value?.retryOperation?.invoke()
     }
 
-    class MoviesListViewModelFactory(
-        private val moviesRepository: MoviesRepository,
-        private val movieSearchRepository: MovieSearchRepository
-    ) : ViewModelProvider.NewInstanceFactory() {
+    class MoviesListViewModelFactory(private val moviesRepository: MoviesRepository) :
+        ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(MoviesListViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return MoviesListViewModel(moviesRepository, movieSearchRepository) as T
+                return MoviesListViewModel(moviesRepository) as T
             } else {
                 throw Error("Incorrect ViewModel requested: only MoviesListViewModel can be provided here")
             }
