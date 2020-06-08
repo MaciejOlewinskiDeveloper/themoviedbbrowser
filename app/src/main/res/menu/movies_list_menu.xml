@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/refresh_item"
-        android:icon="@drawable/ic_baseline_refresh_24"
+        android:icon="@drawable/ic_toolbar_refresh_24"
         android:title="@string/now_playing_list_menu_refresh_item_label"
         app:showAsAction="never" />
 

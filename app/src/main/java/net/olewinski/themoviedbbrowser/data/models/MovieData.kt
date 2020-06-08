@@ -3,18 +3,18 @@ package net.olewinski.themoviedbbrowser.data.models
 import androidx.lifecycle.LiveData
 import com.google.gson.annotations.SerializedName
 
-data class NowPlaying(
+data class MovieData(
     @SerializedName("id")
     val id: Long,
 
     @SerializedName("title")
     val title: String,
 
-    @SerializedName("overview")
-    val overview: String,
-
     @SerializedName("original_title")
     val originalTitle: String,
+
+    @SerializedName("overview")
+    val overview: String,
 
     @SerializedName("release_date")
     val releaseDate: String,
@@ -23,7 +23,7 @@ data class NowPlaying(
     val voteAverage: Double,
 
     @SerializedName("vote_count")
-    val voteCount: Int,
+    val votesCount: Int,
 
     @SerializedName("poster_path")
     val posterPath: String,

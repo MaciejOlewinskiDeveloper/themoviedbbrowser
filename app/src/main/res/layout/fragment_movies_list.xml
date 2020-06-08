@@ -6,7 +6,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.screens.NowPlayingFragment">
+        tools:context=".ui.screens.MoviesListFragment">
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_to_refresh"
@@ -23,7 +23,7 @@
                 android:layout_height="match_parent"
                 android:scrollbars="vertical"
                 tools:itemCount="32"
-                tools:listitem="@layout/now_playing_list_item" />
+                tools:listitem="@layout/movies_list_item" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

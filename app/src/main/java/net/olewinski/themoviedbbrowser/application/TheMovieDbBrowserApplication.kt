@@ -2,7 +2,6 @@ package net.olewinski.themoviedbbrowser.application
 
 import android.app.Application
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import net.olewinski.themoviedbbrowser.di.components.DaggerApplicationComponent

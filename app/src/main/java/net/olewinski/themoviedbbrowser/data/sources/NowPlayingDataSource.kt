@@ -7,33 +7,33 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.olewinski.themoviedbbrowser.cloud.NetworkDataLoadingState
+import net.olewinski.themoviedbbrowser.cloud.DataLoadingState
 import net.olewinski.themoviedbbrowser.cloud.service.TmdbService
 import net.olewinski.themoviedbbrowser.data.db.TheMovieDbBrowserDatabase
-import net.olewinski.themoviedbbrowser.data.models.NowPlaying
+import net.olewinski.themoviedbbrowser.data.models.MovieData
 import java.util.*
 
 class NowPlayingDataSource(
     private val tmdbService: TmdbService,
     theMovieDbBrowserDatabase: TheMovieDbBrowserDatabase,
     private val coroutineScope: CoroutineScope
-) : PageKeyedDataSource<Long, NowPlaying>() {
+) : PageKeyedDataSource<Long, MovieData>() {
 
-    private val favouritesMoviesIds = Transformations.map(theMovieDbBrowserDatabase.getFavouritesDataDao().getAllFavouritesMoviesIds()) { favouritesDataList ->
+    private val favouritesMoviesIds = Transformations.map(theMovieDbBrowserDatabase.getFavouritesDao().getAllFavouritesMoviesIds()) { favouritesDataList ->
         favouritesDataList.toHashSet()
     }
 
-    val initialNetworkDataLoadingState = MutableLiveData<NetworkDataLoadingState>()
-    val networkDataLoadingState = MutableLiveData<NetworkDataLoadingState>()
+    val initialNetworkDataLoadingState = MutableLiveData<DataLoadingState>()
+    val networkDataLoadingState = MutableLiveData<DataLoadingState>()
 
     private var retryOperation: (() -> Any)? = null
 
     override fun loadInitial(
         params: LoadInitialParams<Long>,
-        callback: LoadInitialCallback<Long, NowPlaying>
+        callback: LoadInitialCallback<Long, MovieData>
     ) {
-        initialNetworkDataLoadingState.postValue(NetworkDataLoadingState.LOADING)
-        networkDataLoadingState.postValue(NetworkDataLoadingState.LOADING)
+        initialNetworkDataLoadingState.postValue(DataLoadingState.LOADING)
+        networkDataLoadingState.postValue(DataLoadingState.LOADING)
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
@@ -53,8 +53,8 @@ class NowPlayingDataSource(
 
                     enhanceResultsWithFavouriteData(results)
 
-                    initialNetworkDataLoadingState.postValue(NetworkDataLoadingState.READY)
-                    networkDataLoadingState.postValue(NetworkDataLoadingState.READY)
+                    initialNetworkDataLoadingState.postValue(DataLoadingState.SUCCESS)
+                    networkDataLoadingState.postValue(DataLoadingState.SUCCESS)
 
                     callback.onResult(results, null, nextKey)
                 } else {
@@ -62,22 +62,22 @@ class NowPlayingDataSource(
                         loadInitial(params, callback)
                     }
 
-                    initialNetworkDataLoadingState.postValue(NetworkDataLoadingState.error(response.message()))
-                    networkDataLoadingState.postValue(NetworkDataLoadingState.error(response.message()))
+                    initialNetworkDataLoadingState.postValue(DataLoadingState.error(response.message()))
+                    networkDataLoadingState.postValue(DataLoadingState.error(response.message()))
                 }
             } catch (e: Exception) {
                 retryOperation = {
                     loadInitial(params, callback)
                 }
 
-                initialNetworkDataLoadingState.postValue(NetworkDataLoadingState.error(e.message))
-                networkDataLoadingState.postValue(NetworkDataLoadingState.error(e.message))
+                initialNetworkDataLoadingState.postValue(DataLoadingState.error(e.message))
+                networkDataLoadingState.postValue(DataLoadingState.error(e.message))
             }
         }
     }
 
-    override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, NowPlaying>) {
-        networkDataLoadingState.postValue(NetworkDataLoadingState.LOADING)
+    override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, MovieData>) {
+        networkDataLoadingState.postValue(DataLoadingState.LOADING)
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
@@ -97,7 +97,7 @@ class NowPlayingDataSource(
 
                     enhanceResultsWithFavouriteData(results)
 
-                    networkDataLoadingState.postValue(NetworkDataLoadingState.READY)
+                    networkDataLoadingState.postValue(DataLoadingState.SUCCESS)
 
                     callback.onResult(results, nextKey)
                 } else {
@@ -105,19 +105,19 @@ class NowPlayingDataSource(
                         loadAfter(params, callback)
                     }
 
-                    networkDataLoadingState.postValue(NetworkDataLoadingState.error(response.message()))
+                    networkDataLoadingState.postValue(DataLoadingState.error(response.message()))
                 }
             } catch (e: Exception) {
                 retryOperation = {
                     loadAfter(params, callback)
                 }
 
-                networkDataLoadingState.postValue(NetworkDataLoadingState.error(e.message))
+                networkDataLoadingState.postValue(DataLoadingState.error(e.message))
             }
         }
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, NowPlaying>) {
+    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, MovieData>) {
         // Do nothing
     }
 
@@ -133,10 +133,10 @@ class NowPlayingDataSource(
         }
     }
 
-    private suspend fun enhanceResultsWithFavouriteData(results: List<NowPlaying>) = withContext(Dispatchers.IO) {
-        results.forEach { nowPlaying: NowPlaying ->
-            nowPlaying.favouriteStatus = Transformations.map(favouritesMoviesIds) { favouritesMoviesIdsSet ->
-                favouritesMoviesIdsSet.contains(nowPlaying.id)
+    private suspend fun enhanceResultsWithFavouriteData(results: List<MovieData>) = withContext(Dispatchers.IO) {
+        results.forEach { movieData: MovieData ->
+            movieData.favouriteStatus = Transformations.map(favouritesMoviesIds) { favouritesMoviesIdsSet ->
+                favouritesMoviesIdsSet.contains(movieData.id)
             }
         }
     }

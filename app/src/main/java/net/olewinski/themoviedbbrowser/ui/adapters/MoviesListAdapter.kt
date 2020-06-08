@@ -6,34 +6,33 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import net.olewinski.themoviedbbrowser.cloud.NetworkDataLoadingState
-import net.olewinski.themoviedbbrowser.data.models.NowPlaying
+import net.olewinski.themoviedbbrowser.cloud.DataLoadingState
+import net.olewinski.themoviedbbrowser.data.models.MovieData
+import net.olewinski.themoviedbbrowser.databinding.MoviesListItemBinding
 import net.olewinski.themoviedbbrowser.databinding.NetworkStateListItemBinding
-import net.olewinski.themoviedbbrowser.databinding.NowPlayingListItemBinding
 
 private const val ITEM_TYPE_REGULAR = 0
 private const val ITEM_TYPE_NETWORK_STATE = 1
 
-class NowPlayingAdapter(
-    // TODO Temporary solution, make ViewHolders to be LifecycleOwners
+class MoviesListAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
-    private val onNowPlayingItemClickedListener: (NowPlaying) -> Unit,
-    private val onItemFavouriteItemClickedListener: (NowPlaying) -> Unit,
+    private val onNowPlayingItemClickedListener: (MovieData) -> Unit,
+    private val onItemFavouriteItemClickedListener: (MovieData) -> Unit,
     private val onRetryButtonClickedListener: () -> Unit
-) : PagedListAdapter<NowPlaying, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
+) : PagedListAdapter<MovieData, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
-    inner class NowPlayingItemViewHolder(private val nowPlayingListItemBinding: NowPlayingListItemBinding) :
-        RecyclerView.ViewHolder(nowPlayingListItemBinding.root) {
-        fun bind(nowPlaying: NowPlaying) {
-            nowPlayingListItemBinding.apply {
-                item = nowPlaying
+    inner class NowPlayingItemViewHolder(private val moviesListItemBinding: MoviesListItemBinding) :
+        RecyclerView.ViewHolder(moviesListItemBinding.root) {
+        fun bind(movieData: MovieData) {
+            moviesListItemBinding.apply {
+                item = movieData
 
                 root.setOnClickListener {
-                    onNowPlayingItemClickedListener.invoke(nowPlaying)
+                    onNowPlayingItemClickedListener.invoke(movieData)
                 }
 
                 favouriteStatus.setOnClickListener {
-                    onItemFavouriteItemClickedListener.invoke(nowPlaying)
+                    onItemFavouriteItemClickedListener.invoke(movieData)
                 }
 
                 executePendingBindings()
@@ -41,11 +40,11 @@ class NowPlayingAdapter(
         }
     }
 
-    private var networkDataLoadingState: NetworkDataLoadingState? = null
+    private var dataLoadingState: DataLoadingState? = null
 
     inner class NetworkDataLoadingStateItemViewHolder(private val networkStateListItemBinding: NetworkStateListItemBinding) :
         RecyclerView.ViewHolder(networkStateListItemBinding.root) {
-        fun bind(state: NetworkDataLoadingState?) {
+        fun bind(state: DataLoadingState?) {
             networkStateListItemBinding.apply {
                 networkDataLoadingState = state
 
@@ -61,7 +60,7 @@ class NowPlayingAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ITEM_TYPE_REGULAR -> {
-                val nowPlayingListItemBinding = NowPlayingListItemBinding.inflate(
+                val nowPlayingListItemBinding = MoviesListItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
@@ -94,7 +93,7 @@ class NowPlayingAdapter(
         when (getItemViewType(position)) {
             ITEM_TYPE_REGULAR -> (holder as NowPlayingItemViewHolder).bind(getItem(position)!!)
             ITEM_TYPE_NETWORK_STATE -> (holder as NetworkDataLoadingStateItemViewHolder).bind(
-                networkDataLoadingState
+                dataLoadingState
             )
         }
     }
@@ -105,13 +104,13 @@ class NowPlayingAdapter(
     override fun getItemCount() =
         super.getItemCount() + if (shouldHaveNetworkDataLoadingStateRow()) 1 else 0
 
-    fun updateNetworkState(newState: NetworkDataLoadingState) {
+    fun updateNetworkState(newState: DataLoadingState) {
         // Remembering previous state
-        val previousState = networkDataLoadingState
+        val previousState = dataLoadingState
         val previousShouldHaveNetworkDataLoadingStateRow = shouldHaveNetworkDataLoadingStateRow()
 
         // Applying new state
-        networkDataLoadingState = newState
+        dataLoadingState = newState
 
         // Checking if network state row should be displayed
         val newShouldHaveNetworkDataLoadingStateRow = shouldHaveNetworkDataLoadingStateRow()
@@ -130,14 +129,14 @@ class NowPlayingAdapter(
     }
 
     private fun shouldHaveNetworkDataLoadingStateRow() =
-        networkDataLoadingState != null && networkDataLoadingState != NetworkDataLoadingState.READY
+        dataLoadingState != null && dataLoadingState != DataLoadingState.SUCCESS
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<NowPlaying>() {
-            override fun areItemsTheSame(oldItem: NowPlaying, newItem: NowPlaying) =
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<MovieData>() {
+            override fun areItemsTheSame(oldItem: MovieData, newItem: MovieData) =
                 oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: NowPlaying, newItem: NowPlaying) =
+            override fun areContentsTheSame(oldItem: MovieData, newItem: MovieData) =
                 oldItem == newItem
         }
     }

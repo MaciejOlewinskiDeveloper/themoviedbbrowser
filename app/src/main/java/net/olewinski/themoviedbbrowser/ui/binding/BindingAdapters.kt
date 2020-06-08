@@ -10,7 +10,7 @@ import net.olewinski.themoviedbbrowser.R
 fun loadFromUrlToImageView(view: ImageView, imageUrl: String) {
     Glide.with(view.context)
         .load(imageUrl)
-        .error(R.drawable.ic_image_black_64dp)
+        .error(R.drawable.ic_image_placeholder_64dp)
         .transition(DrawableTransitionOptions.withCrossFade())
         .into(view)
 }

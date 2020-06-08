@@ -15,19 +15,19 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import net.olewinski.themoviedbbrowser.R
 import net.olewinski.themoviedbbrowser.application.TheMovieDbBrowserApplication
-import net.olewinski.themoviedbbrowser.cloud.NetworkDataLoadingState
-import net.olewinski.themoviedbbrowser.databinding.FragmentNowPlayingBinding
-import net.olewinski.themoviedbbrowser.ui.adapters.NowPlayingAdapter
+import net.olewinski.themoviedbbrowser.cloud.DataLoadingState
+import net.olewinski.themoviedbbrowser.databinding.FragmentMoviesListBinding
+import net.olewinski.themoviedbbrowser.ui.adapters.MoviesListAdapter
 import net.olewinski.themoviedbbrowser.viewmodels.MovieDetailsNavigationRequest
-import net.olewinski.themoviedbbrowser.viewmodels.NowPlayingViewModel
+import net.olewinski.themoviedbbrowser.viewmodels.MoviesListViewModel
 import net.olewinski.themoviedbbrowser.viewmodels.SelectedMovieViewModel
 
-class NowPlayingFragment : Fragment() {
+class MoviesListFragment : Fragment() {
 
-    private lateinit var nowPlayingBinding: FragmentNowPlayingBinding
-    private lateinit var nowPlayingAdapter: NowPlayingAdapter
+    private lateinit var moviesListBinding: FragmentMoviesListBinding
+    private lateinit var moviesListAdapter: MoviesListAdapter
 
-    private lateinit var nowPlayingViewModel: NowPlayingViewModel
+    private lateinit var moviesListViewModel: MoviesListViewModel
     private lateinit var selectedMovieViewModel: SelectedMovieViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,10 +36,10 @@ class NowPlayingFragment : Fragment() {
         setHasOptionsMenu(true)
 
         activity?.let { activity ->
-            nowPlayingViewModel = ViewModelProvider(
+            moviesListViewModel = ViewModelProvider(
                 viewModelStore,
                 (activity.applicationContext as TheMovieDbBrowserApplication).applicationComponent.getNowPlayingViewModelFactory()
-            ).get(NowPlayingViewModel::class.java)
+            ).get(MoviesListViewModel::class.java)
 
             selectedMovieViewModel = ViewModelProvider(
                 activity.viewModelStore,
@@ -53,61 +53,61 @@ class NowPlayingFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        nowPlayingBinding = FragmentNowPlayingBinding.inflate(inflater, container, false)
-        nowPlayingBinding.lifecycleOwner = viewLifecycleOwner
+        moviesListBinding = FragmentMoviesListBinding.inflate(inflater, container, false)
+        moviesListBinding.lifecycleOwner = viewLifecycleOwner
 
-        return nowPlayingBinding.root
+        return moviesListBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        nowPlayingViewModel.navigationRequest.observe(
+        moviesListViewModel.navigationRequest.observe(
             viewLifecycleOwner,
             Observer { navigationRequestOneTimeEvent ->
                 navigationRequestOneTimeEvent.getContent()?.let { navigationRequest ->
                     when (navigationRequest) {
                         is MovieDetailsNavigationRequest -> {
-                            selectedMovieViewModel.selectMovie(navigationRequest.nowPlaying)
-                            findNavController().navigate(NowPlayingFragmentDirections.actionMoviesCollectionFragmentToMovieDetailsFragment())
+                            selectedMovieViewModel.selectMovie(navigationRequest.movieData)
+                            findNavController().navigate(MoviesListFragmentDirections.actionMoviesCollectionFragmentToMovieDetailsFragment())
                         }
                     }
                 }
             })
 
-        nowPlayingAdapter = NowPlayingAdapter(viewLifecycleOwner, { item ->
-            nowPlayingViewModel.onItemClicked(item)
+        moviesListAdapter = MoviesListAdapter(viewLifecycleOwner, { item ->
+            moviesListViewModel.onItemClicked(item)
         }, { item ->
-            nowPlayingViewModel.onItemFavouriteToggleClicked(item)
+            moviesListViewModel.onItemFavouriteToggleClicked(item)
         }, {
-            nowPlayingViewModel.retry()
+            moviesListViewModel.retry()
         })
 
-        nowPlayingBinding.nowPlayingList.apply {
-            adapter = nowPlayingAdapter
+        moviesListBinding.nowPlayingList.apply {
+            adapter = moviesListAdapter
             layoutManager = LinearLayoutManager(context)
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
         }
 
-        nowPlayingViewModel.pagedData.observe(viewLifecycleOwner, Observer {
-            nowPlayingAdapter.submitList(it)
+        moviesListViewModel.pagedData.observe(viewLifecycleOwner, Observer {
+            moviesListAdapter.submitList(it)
         })
 
-        nowPlayingViewModel.networkState.observe(viewLifecycleOwner, Observer {
-            nowPlayingAdapter.updateNetworkState(it)
+        moviesListViewModel.networkState.observe(viewLifecycleOwner, Observer {
+            moviesListAdapter.updateNetworkState(it)
         })
 
-        nowPlayingViewModel.refreshState.observe(viewLifecycleOwner, Observer {
-            nowPlayingBinding.swipeToRefresh.isRefreshing = it == NetworkDataLoadingState.LOADING
+        moviesListViewModel.refreshState.observe(viewLifecycleOwner, Observer {
+            moviesListBinding.swipeToRefresh.isRefreshing = it == DataLoadingState.LOADING
         })
 
-        nowPlayingBinding.swipeToRefresh.setOnRefreshListener {
-            nowPlayingViewModel.refresh()
+        moviesListBinding.swipeToRefresh.setOnRefreshListener {
+            moviesListViewModel.refresh()
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.now_playing_list_menu, menu)
+        inflater.inflate(R.menu.movies_list_menu, menu)
 
         initSearchItem(menu.findItem(R.id.search_item).actionView as SearchView)
 
@@ -116,7 +116,7 @@ class NowPlayingFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.refresh_item -> {
-            nowPlayingViewModel.refresh()
+            moviesListViewModel.refresh()
 
             true
         }
@@ -136,7 +136,7 @@ class NowPlayingFragment : Fragment() {
             CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER
         )
 
-        nowPlayingViewModel.lastTypedSearchQuery?.also { currentSearchQuery ->
+        moviesListViewModel.lastTypedSearchQuery?.also { currentSearchQuery ->
             searchView.isIconified = false
             searchView.setQuery(currentSearchQuery, false);
         }
@@ -147,13 +147,13 @@ class NowPlayingFragment : Fragment() {
 
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    nowPlayingViewModel.requestSearchSuggestionsUpdate(newText)
+                    moviesListViewModel.requestSearchSuggestionsUpdate(newText)
 
                     return true
                 }
 
                 override fun onQueryTextSubmit(query: String?): Boolean {
-                    nowPlayingViewModel.searchMovies(query)
+                    moviesListViewModel.searchMovies(query)
 
                     return true
                 }
@@ -174,12 +174,12 @@ class NowPlayingFragment : Fragment() {
             })
 
             setOnCloseListener {
-                nowPlayingViewModel.showNowPlaying()
+                moviesListViewModel.showNowPlaying()
                 false
             }
         }
 
-        nowPlayingViewModel.searchSuggestions.observe(
+        moviesListViewModel.searchSuggestions.observe(
             viewLifecycleOwner,
             Observer { searchSuggestions ->
                 searchView.suggestionsAdapter.apply {

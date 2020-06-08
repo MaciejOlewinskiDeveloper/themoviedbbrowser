@@ -9,7 +9,7 @@
 
         <variable
             name="item"
-            type="net.olewinski.themoviedbbrowser.data.models.NowPlaying" />
+            type="net.olewinski.themoviedbbrowser.data.models.MovieData" />
     </data>
 
     <ScrollView
@@ -30,7 +30,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:src="@drawable/ic_image_black_256dp" />
+                tools:src="@drawable/ic_image_placeholder_256dp" />
 
             <TextView
                 android:id="@+id/title"
@@ -144,7 +144,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@{@plurals/votes_count(item.voteCount, item.voteCount)}"
+                android:text="@{@plurals/votes_count(item.votesCount, item.votesCount)}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/average_rate_value"
                 app:layout_constraintTop_toBottomOf="@+id/release_date_bottom_barrier"

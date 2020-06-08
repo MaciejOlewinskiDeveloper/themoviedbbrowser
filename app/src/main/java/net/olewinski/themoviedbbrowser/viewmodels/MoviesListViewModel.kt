@@ -6,18 +6,18 @@ import android.database.MatrixCursor
 import android.provider.BaseColumns
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
-import net.olewinski.themoviedbbrowser.data.models.NowPlaying
+import net.olewinski.themoviedbbrowser.data.models.MovieData
 import net.olewinski.themoviedbbrowser.data.repository.MovieSearchRepository
-import net.olewinski.themoviedbbrowser.data.repository.NowPlayingRepository
+import net.olewinski.themoviedbbrowser.data.repository.MoviesRepository
 import net.olewinski.themoviedbbrowser.util.OneTimeEvent
 
 const val AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD = 2
 
 sealed class NavigationRequest
-class MovieDetailsNavigationRequest(val nowPlaying: NowPlaying) : NavigationRequest()
+class MovieDetailsNavigationRequest(val movieData: MovieData) : NavigationRequest()
 
-class NowPlayingViewModel(
-    private val nowPlayingRepository: NowPlayingRepository,
+class MoviesListViewModel(
+    private val moviesRepository: MoviesRepository,
     private val movieSearchRepository: MovieSearchRepository
 ) : ViewModel() {
     private val mutableNavigationRequest = MutableLiveData<OneTimeEvent<NavigationRequest>>()
@@ -36,9 +36,9 @@ class NowPlayingViewModel(
 
     private val moviesData = Transformations.map(currentSearchQuery) { searchQuery ->
         if (searchQuery.isNullOrBlank()) {
-            nowPlayingRepository.getNowPlayingData(viewModelScope)
+            moviesRepository.getNowPlayingData(viewModelScope)
         } else {
-            nowPlayingRepository.searchMovies(viewModelScope, searchQuery)
+            moviesRepository.searchMovies(viewModelScope, searchQuery)
         }
     }
 
@@ -47,7 +47,7 @@ class NowPlayingViewModel(
     }
 
     val networkState = Transformations.switchMap(moviesData) { value ->
-        value.networkState
+        value.state
     }
 
     val refreshState = Transformations.switchMap(moviesData) { value ->
@@ -102,13 +102,13 @@ class NowPlayingViewModel(
         currentSearchQuery.value = null
     }
 
-    fun onItemClicked(nowPlaying: NowPlaying) {
-        mutableNavigationRequest.value = OneTimeEvent(MovieDetailsNavigationRequest(nowPlaying))
+    fun onItemClicked(movieData: MovieData) {
+        mutableNavigationRequest.value = OneTimeEvent(MovieDetailsNavigationRequest(movieData))
     }
 
-    fun onItemFavouriteToggleClicked(nowPlaying: NowPlaying) {
+    fun onItemFavouriteToggleClicked(movieData: MovieData) {
         GlobalScope.launch {
-            nowPlayingRepository.toggleFavouriteData(nowPlaying)
+            moviesRepository.toggleFavouriteData(movieData)
         }
     }
 
@@ -116,16 +116,16 @@ class NowPlayingViewModel(
         moviesData.value?.retryOperation?.invoke()
     }
 
-    class NowPlayingViewModelFactory(
-        private val nowPlayingRepository: NowPlayingRepository,
+    class MoviesListViewModelFactory(
+        private val moviesRepository: MoviesRepository,
         private val movieSearchRepository: MovieSearchRepository
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(NowPlayingViewModel::class.java)) {
+            if (modelClass.isAssignableFrom(MoviesListViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return NowPlayingViewModel(nowPlayingRepository, movieSearchRepository) as T
+                return MoviesListViewModel(moviesRepository, movieSearchRepository) as T
             } else {
-                throw Error("Incorrect ViewModel requested: only NowPlayingViewModel can be provided here")
+                throw Error("Incorrect ViewModel requested: only MoviesListViewModel can be provided here")
             }
         }
     }

@@ -8,7 +8,7 @@ import net.olewinski.themoviedbbrowser.di.modules.FragmentsModule
 import net.olewinski.themoviedbbrowser.di.modules.TmdbServiceModule
 import net.olewinski.themoviedbbrowser.di.qualifiers.ApplicationContext
 import net.olewinski.themoviedbbrowser.di.scopes.ApplicationScope
-import net.olewinski.themoviedbbrowser.viewmodels.NowPlayingViewModel
+import net.olewinski.themoviedbbrowser.viewmodels.MoviesListViewModel
 import net.olewinski.themoviedbbrowser.viewmodels.SelectedMovieViewModel
 
 @ApplicationScope
@@ -17,7 +17,7 @@ interface ApplicationComponent {
     @ApplicationContext
     fun getApplicationContext(): Context
 
-    fun getNowPlayingViewModelFactory(): NowPlayingViewModel.NowPlayingViewModelFactory
+    fun getNowPlayingViewModelFactory(): MoviesListViewModel.MoviesListViewModelFactory
 
     fun getSelectedMovieViewModelFactory(): SelectedMovieViewModel.SelectedMovieViewModelFactory
 }
