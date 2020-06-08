@@ -1,4 +1,4 @@
-package net.olewinski.themoviedbbrowser.data.sources
+package net.olewinski.themoviedbbrowser.data.sources.base
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations

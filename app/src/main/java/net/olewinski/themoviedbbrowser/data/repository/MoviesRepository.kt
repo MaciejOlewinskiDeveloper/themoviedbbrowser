@@ -12,6 +12,7 @@ import net.olewinski.themoviedbbrowser.data.db.TheMovieDbBrowserDatabase
 import net.olewinski.themoviedbbrowser.data.models.MovieData
 import net.olewinski.themoviedbbrowser.data.sources.NowPlayingDataSourceFactory
 import net.olewinski.themoviedbbrowser.data.sources.SearchMoviesDataSourceFactory
+import net.olewinski.themoviedbbrowser.data.sources.base.BaseMoviesListDataSourceFactory
 import net.olewinski.themoviedbbrowser.di.scopes.ApplicationScope
 import java.util.*
 import javax.inject.Inject
@@ -31,45 +32,22 @@ class MoviesRepository @Inject constructor(
         theMovieDbBrowserDatabase.getFavouritesDao().toggleFavouritesStatusForMovie(movieData.id)
     }
 
-    fun getNowPlayingData(coroutineScope: CoroutineScope): PagedDataContainer<MovieData> {
-        val nowPlayingDataSourceFactory = NowPlayingDataSourceFactory(tmdbService, theMovieDbBrowserDatabase, coroutineScope)
-
-        return PagedDataContainer(
-            pagedData = nowPlayingDataSourceFactory.toLiveData(DEFAULT_PAGE_SIZE_ITEMS),
-            state = Transformations.switchMap(nowPlayingDataSourceFactory.nowPlayingDataSource) { nowPlayingDataSource ->
-                nowPlayingDataSource.networkDataLoadingState
-            },
-            retryOperation = {
-                nowPlayingDataSourceFactory.nowPlayingDataSource.value?.retryAllFailed()
-            },
-            refreshDataOperation = {
-                nowPlayingDataSourceFactory.nowPlayingDataSource.value?.invalidate()
-            },
-            refreshState = Transformations.switchMap(nowPlayingDataSourceFactory.nowPlayingDataSource) { nowPlayingDataSource ->
-                nowPlayingDataSource.initialNetworkDataLoadingState
-            }
+    fun getNowPlayingData(coroutineScope: CoroutineScope) = getPagedDataContainer(
+        NowPlayingDataSourceFactory(
+            tmdbService,
+            theMovieDbBrowserDatabase,
+            coroutineScope
         )
-    }
+    )
 
-    fun searchMovies(coroutineScope: CoroutineScope, searchQuery: String): PagedDataContainer<MovieData> {
-        val searchMoviesDataSourceFactory = SearchMoviesDataSourceFactory(tmdbService, theMovieDbBrowserDatabase, coroutineScope, searchQuery)
-
-        return PagedDataContainer(
-            pagedData = searchMoviesDataSourceFactory.toLiveData(DEFAULT_PAGE_SIZE_ITEMS),
-            state = Transformations.switchMap(searchMoviesDataSourceFactory.searchMoviesDataSource) { searchMoviesDataSource ->
-                searchMoviesDataSource.networkDataLoadingState
-            },
-            retryOperation = {
-                searchMoviesDataSourceFactory.searchMoviesDataSource.value?.retryAllFailed()
-            },
-            refreshDataOperation = {
-                searchMoviesDataSourceFactory.searchMoviesDataSource.value?.invalidate()
-            },
-            refreshState = Transformations.switchMap(searchMoviesDataSourceFactory.searchMoviesDataSource) { searchMoviesDataSource ->
-                searchMoviesDataSource.initialNetworkDataLoadingState
-            }
+    fun searchMovies(coroutineScope: CoroutineScope, searchQuery: String) = getPagedDataContainer(
+        SearchMoviesDataSourceFactory(
+            tmdbService,
+            theMovieDbBrowserDatabase,
+            coroutineScope,
+            searchQuery
         )
-    }
+    )
 
     suspend fun getMoviesSearchSuggestions(searchQuery: String): List<String> {
         try {
@@ -98,4 +76,21 @@ class MoviesRepository @Inject constructor(
 
         return emptyList()
     }
+
+    private fun getPagedDataContainer(moviesListDataSourceFactory: BaseMoviesListDataSourceFactory<*>) =
+        PagedDataContainer(
+            pagedData = moviesListDataSourceFactory.toLiveData(DEFAULT_PAGE_SIZE_ITEMS),
+            state = Transformations.switchMap(moviesListDataSourceFactory.moviesListDataSource) { searchMoviesDataSource ->
+                searchMoviesDataSource.networkDataLoadingState
+            },
+            retryOperation = {
+                moviesListDataSourceFactory.moviesListDataSource.value?.retryAllFailed()
+            },
+            refreshDataOperation = {
+                moviesListDataSourceFactory.moviesListDataSource.value?.invalidate()
+            },
+            refreshState = Transformations.switchMap(moviesListDataSourceFactory.moviesListDataSource) { searchMoviesDataSource ->
+                searchMoviesDataSource.initialNetworkDataLoadingState
+            }
+        )
 }
