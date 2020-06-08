@@ -67,7 +67,7 @@ class MoviesListViewModel(private val moviesRepository: MoviesRepository) : View
 
         if (!searchQuery.isNullOrBlank() && searchQuery.length > AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD) {
             fetchSearchSuggestionsOperation = viewModelScope.launch {
-                val newSearchSuggestions = moviesRepository.getSearchSuggestions(searchQuery)
+                val newSearchSuggestions = moviesRepository.getMoviesSearchSuggestions(searchQuery)
 
                 val matrixCursor = MatrixCursor(
                     arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1),

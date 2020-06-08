@@ -34,7 +34,6 @@ class SearchMoviesDataSource(
         callback: LoadInitialCallback<Long, MovieData>
     ) {
         initialNetworkDataLoadingState.postValue(DataLoadingState.LOADING)
-        networkDataLoadingState.postValue(DataLoadingState.LOADING)
 
         coroutineScope.launch(Dispatchers.IO) {
             try {

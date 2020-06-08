@@ -16,6 +16,8 @@ import net.olewinski.themoviedbbrowser.di.scopes.ApplicationScope
 import java.util.*
 import javax.inject.Inject
 
+private const val DEFAULT_PAGE_SIZE_ITEMS = 32
+
 @ApplicationScope
 class MoviesRepository @Inject constructor(
     private val tmdbService: TmdbService,
@@ -33,7 +35,7 @@ class MoviesRepository @Inject constructor(
         val nowPlayingDataSourceFactory = NowPlayingDataSourceFactory(tmdbService, theMovieDbBrowserDatabase, coroutineScope)
 
         return PagedDataContainer(
-            pagedData = nowPlayingDataSourceFactory.toLiveData(32),
+            pagedData = nowPlayingDataSourceFactory.toLiveData(DEFAULT_PAGE_SIZE_ITEMS),
             state = Transformations.switchMap(nowPlayingDataSourceFactory.nowPlayingDataSource) { nowPlayingDataSource ->
                 nowPlayingDataSource.networkDataLoadingState
             },
@@ -53,7 +55,7 @@ class MoviesRepository @Inject constructor(
         val searchMoviesDataSourceFactory = SearchMoviesDataSourceFactory(tmdbService, theMovieDbBrowserDatabase, coroutineScope, searchQuery)
 
         return PagedDataContainer(
-            pagedData = searchMoviesDataSourceFactory.toLiveData(32),
+            pagedData = searchMoviesDataSourceFactory.toLiveData(DEFAULT_PAGE_SIZE_ITEMS),
             state = Transformations.switchMap(searchMoviesDataSourceFactory.searchMoviesDataSource) { searchMoviesDataSource ->
                 searchMoviesDataSource.networkDataLoadingState
             },
@@ -69,12 +71,12 @@ class MoviesRepository @Inject constructor(
         )
     }
 
-    suspend fun getSearchSuggestions(query: String): List<String> {
+    suspend fun getMoviesSearchSuggestions(searchQuery: String): List<String> {
         try {
             val response = tmdbService.searchMovies(
                 apiKey = TmdbService.TMDB_API_KEY,
                 language = Locale.getDefault().language,
-                query = query,
+                query = searchQuery,
                 page = 1L
             )
 
