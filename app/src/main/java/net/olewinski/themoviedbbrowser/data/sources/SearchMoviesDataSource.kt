@@ -82,9 +82,10 @@ class SearchMoviesDataSource(
 
         coroutineScope.launch(Dispatchers.IO) {
             try {
-                val response = tmdbService.getNowPlaying(
+                val response = tmdbService.searchMovies(
                     apiKey = TmdbService.TMDB_API_KEY,
                     language = Locale.getDefault().language,
+                    query = searchQuery,
                     page = params.key
                 )
 
