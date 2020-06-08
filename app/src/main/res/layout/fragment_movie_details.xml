@@ -26,6 +26,7 @@
                 android:id="@+id/backdrop_image_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:contentDescription="@string/backdrop_content_description"
                 app:imageUrl="@{TmdbService.MEDIUM_BACKDROP_BASE_URL + item.backdropPath}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

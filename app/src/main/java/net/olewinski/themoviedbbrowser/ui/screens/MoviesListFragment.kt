@@ -138,7 +138,7 @@ class MoviesListFragment : Fragment() {
 
         moviesListViewModel.lastTypedSearchQuery?.also { currentSearchQuery ->
             searchView.isIconified = false
-            searchView.setQuery(currentSearchQuery, false);
+            searchView.setQuery(currentSearchQuery, false)
         }
 
         searchView.apply {

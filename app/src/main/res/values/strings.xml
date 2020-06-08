@@ -7,6 +7,7 @@
 
     <!-- Accessibility -->
     <string name="poster_content_description">Movie\'s poster</string>
+    <string name="backdrop_content_description">Movie\'s backdrop image</string>
     <string name="favourite_status_enabled_content_description">Enabled movie\'s favourite status toggle</string>
     <string name="favourite_status_disabled_content_description">Disabled movie\'s favourite status toggle</string>
 
