@@ -12,14 +12,36 @@ import net.olewinski.themoviedbbrowser.util.OneTimeEvent
 
 const val AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD = 2
 
+/**
+ * Helper class representing navigation request; to be used to request navigation actions from view
+ * that observes current view model.
+ */
 sealed class NavigationRequest
+
+/**
+ * Request to navigate to movie details screen.
+ *
+ * @param movieData Movie which details should be shown.
+ */
 class MovieDetailsNavigationRequest(val movieData: MovieData) : NavigationRequest()
 
+/**
+ * View model for movies list screen
+ *
+ * @param moviesRepository  [MoviesRepository]
+ */
 class MoviesListViewModel(private val moviesRepository: MoviesRepository) : ViewModel() {
+
     private val mutableNavigationRequest = MutableLiveData<OneTimeEvent<NavigationRequest>>()
+    /**
+     * Observable navigation request.
+     */
     val navigationRequest: LiveData<OneTimeEvent<NavigationRequest>> = mutableNavigationRequest
 
     private val mutableSearchSuggestions = MutableLiveData<Cursor>()
+    /**
+     * Observable search suggestions.
+     */
     val searchSuggestions: LiveData<Cursor> = mutableSearchSuggestions
 
     private var fetchSearchSuggestionsOperation: Job? = null
@@ -28,6 +50,9 @@ class MoviesListViewModel(private val moviesRepository: MoviesRepository) : View
         value = null
     }
 
+    /**
+     * Last typed search query.
+     */
     var lastTypedSearchQuery: String? = null
 
     private val moviesData = Transformations.map(currentSearchQuery) { searchQuery ->
@@ -38,22 +63,39 @@ class MoviesListViewModel(private val moviesRepository: MoviesRepository) : View
         }
     }
 
-    val pagedData = Transformations.switchMap(moviesData) { value ->
+    /**
+     * Movies list data.
+     */
+    val pagedMoviesData = Transformations.switchMap(moviesData) { value ->
         value.pagedData
     }
 
+    /**
+     * Network data loading state for non-initial loading.
+     */
     val networkState = Transformations.switchMap(moviesData) { value ->
         value.state
     }
 
+    /**
+     * Network data loading state for initial loading (refreshing).
+     */
     val refreshState = Transformations.switchMap(moviesData) { value ->
         value.refreshState
     }
 
-    fun refresh() {
+    /**
+     * Triggers data refresh.
+     */
+    fun refreshMoviesData() {
         moviesData.value?.refreshDataOperation?.invoke()
     }
 
+    /**
+     * Requests updating search suggestions for passed search query.
+     *
+     * @param searchQuery   Query for which the search suggestions should be fetched.
+     */
     fun requestSearchSuggestionsUpdate(searchQuery: String?) {
         lastTypedSearchQuery = searchQuery
 
@@ -65,6 +107,7 @@ class MoviesListViewModel(private val moviesRepository: MoviesRepository) : View
         fetchSearchSuggestionsOperation?.cancel()
         fetchSearchSuggestionsOperation = null
 
+        // Only fetching suggestions for search queries of minimum length
         if (!searchQuery.isNullOrBlank() && searchQuery.length > AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD) {
             fetchSearchSuggestionsOperation = viewModelScope.launch {
                 val newSearchSuggestions = moviesRepository.getMoviesSearchSuggestions(searchQuery)
@@ -74,7 +117,7 @@ class MoviesListViewModel(private val moviesRepository: MoviesRepository) : View
                     newSearchSuggestions.size
                 )
 
-                // Computation
+                // Computation thread for creating matrix cursor
                 withContext(Dispatchers.Default) {
                     newSearchSuggestions.forEachIndexed { id, searchSuggestion ->
                         matrixCursor.newRow()
@@ -88,30 +131,50 @@ class MoviesListViewModel(private val moviesRepository: MoviesRepository) : View
         }
     }
 
+    /**
+     * Requests searching movies by given query
+     *
+     * @param searchQuery Search query.
+     */
     fun searchMovies(searchQuery: String?) {
         lastTypedSearchQuery = searchQuery
         currentSearchQuery.value = searchQuery
     }
 
-    fun showNowPlaying() {
+    /**
+     * Requests "Now Playing" data
+     */
+    fun getNowPlaying() {
         lastTypedSearchQuery = null
         currentSearchQuery.value = null
     }
 
+    /**
+     * Handles [MovieData] item click.
+     *
+     * @param movieData Clicked [MovieData].
+     */
     fun onItemClicked(movieData: MovieData) {
         mutableNavigationRequest.value = OneTimeEvent(MovieDetailsNavigationRequest(movieData))
     }
 
+    /**
+     * Handles clicking favourite toggle for movie.
+     *
+     * @param movieData [MovieData] which favourite toggle was cliked.
+     */
     fun onItemFavouriteToggleClicked(movieData: MovieData) {
         moviesRepository.toggleFavouritesStatusForMovie(GlobalScope, movieData)
     }
 
+    /**
+     * Request retry of last failed data fetch operation.
+     */
     fun retry() {
         moviesData.value?.retryOperation?.invoke()
     }
 
-    class MoviesListViewModelFactory(private val moviesRepository: MoviesRepository) :
-        ViewModelProvider.NewInstanceFactory() {
+    class Factory(private val moviesRepository: MoviesRepository) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(MoviesListViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")

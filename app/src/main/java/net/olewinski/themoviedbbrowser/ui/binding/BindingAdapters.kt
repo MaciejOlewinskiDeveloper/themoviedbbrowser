@@ -6,6 +6,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import net.olewinski.themoviedbbrowser.R
 
+/**
+ * [BindingAdapter] for Android Data Binding library to handle loading images from URLs.
+ */
 @BindingAdapter("imageUrl")
 fun loadFromUrlToImageView(view: ImageView, imageUrl: String) {
     Glide.with(view.context)

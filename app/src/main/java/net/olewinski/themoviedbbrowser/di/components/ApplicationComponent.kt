@@ -11,13 +11,16 @@ import net.olewinski.themoviedbbrowser.di.scopes.ApplicationScope
 import net.olewinski.themoviedbbrowser.viewmodels.MoviesListViewModel
 import net.olewinski.themoviedbbrowser.viewmodels.SelectedMovieViewModel
 
+/**
+ * Main Dagger component.
+ */
 @ApplicationScope
 @Component(modules = [ContextModule::class, TmdbServiceModule::class, FragmentsModule::class, DatabaseModule::class])
 interface ApplicationComponent {
     @ApplicationContext
     fun getApplicationContext(): Context
 
-    fun getMoviesListViewModelFactory(): MoviesListViewModel.MoviesListViewModelFactory
+    fun getMoviesListViewModelFactory(): MoviesListViewModel.Factory
 
-    fun getSelectedMovieViewModelFactory(): SelectedMovieViewModel.SelectedMovieViewModelFactory
+    fun getSelectedMovieViewModelFactory(): SelectedMovieViewModel.Factory
 }

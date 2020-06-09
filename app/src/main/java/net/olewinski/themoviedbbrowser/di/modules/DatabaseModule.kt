@@ -9,6 +9,9 @@ import net.olewinski.themoviedbbrowser.data.db.TheMovieDbBrowserDatabase
 import net.olewinski.themoviedbbrowser.di.qualifiers.ApplicationContext
 import net.olewinski.themoviedbbrowser.di.scopes.ApplicationScope
 
+/**
+ * Dagger [Module] providing application-scoped singleton of [TheMovieDbBrowserDatabase].
+ */
 @Module(includes = [ContextModule::class])
 class DatabaseModule {
     @Provides

@@ -12,6 +12,9 @@ import net.olewinski.themoviedbbrowser.application.TheMovieDbBrowserApplication
 import net.olewinski.themoviedbbrowser.databinding.FragmentMovieDetailsBinding
 import net.olewinski.themoviedbbrowser.viewmodels.SelectedMovieViewModel
 
+/**
+ * Screen with movie details.
+ */
 class MovieDetailsFragment : Fragment() {
 
     private lateinit var movieDetailsBinding: FragmentMovieDetailsBinding
