@@ -1,5 +1,8 @@
 package net.olewinski.themoviedbbrowser.data.db
 
+/**
+ * Collection of constants for defining database
+ */
 object DbSchemaConstants {
     // General DB constants
     const val THE_MOVIE_DB_BROWSER_DATABASE_NAME = "the_movie_db_browser_database"

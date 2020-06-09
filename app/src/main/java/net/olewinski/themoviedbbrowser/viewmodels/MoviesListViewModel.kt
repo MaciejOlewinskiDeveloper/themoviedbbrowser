@@ -103,9 +103,7 @@ class MoviesListViewModel(private val moviesRepository: MoviesRepository) : View
     }
 
     fun onItemFavouriteToggleClicked(movieData: MovieData) {
-        GlobalScope.launch {
-            moviesRepository.toggleFavouriteData(movieData)
-        }
+        moviesRepository.toggleFavouritesStatusForMovie(GlobalScope, movieData)
     }
 
     fun retry() {

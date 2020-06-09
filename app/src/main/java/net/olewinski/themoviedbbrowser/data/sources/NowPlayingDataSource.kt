@@ -8,6 +8,13 @@ import net.olewinski.themoviedbbrowser.data.sources.base.BaseMoviesListDataSourc
 import retrofit2.Response
 import java.util.*
 
+/**
+ * Data source that provides paged data of "Now Playing" movies.
+ *
+ * @param tmdbService               Object for accessing TMBD web service API.
+ * @param theMovieDbBrowserDatabase Local database.
+ * @param coroutineScope            [CoroutineScope] to run data fetching operations inside.
+ */
 class NowPlayingDataSource(
     private val tmdbService: TmdbService,
     theMovieDbBrowserDatabase: TheMovieDbBrowserDatabase,

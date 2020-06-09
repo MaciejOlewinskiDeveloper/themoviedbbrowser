@@ -7,6 +7,15 @@ buildscript {
         paging_version = '2.1.2'
         dagger_version = '2.28'
         gson_version = '2.8.6'
+        // Not the newest version of Retrofit, since everything above 2.6.4 is only compatible with
+        // Android > 5 and we wanted to be also compatible with 4.4 (KitKat). It's possible to fix
+        // that using tips from this article:
+        //
+        // https://cashapp.github.io/2019-02-05/okhttp-3-13-requires-android-5
+        //
+        // but I just didn't have time to study. In commercial application it would be critical to
+        // carefully investigate this topic and make proper solution instead of just using older
+        // Retrofit version
         retrofit_version = '2.6.4'
         logging_interceptor_version = '3.12.0'
         glide_version = '4.11.0'

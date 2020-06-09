@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import net.olewinski.themoviedbbrowser.data.models.MovieData
 import net.olewinski.themoviedbbrowser.data.repository.MoviesRepository
 
@@ -20,9 +19,7 @@ class SelectedMovieViewModel(private val moviesRepository: MoviesRepository) : V
 
     fun onItemFavouriteToggleClicked() {
         selectedMovie.value?.let { selectedMovie ->
-            GlobalScope.launch {
-                moviesRepository.toggleFavouriteData(selectedMovie)
-            }
+            moviesRepository.toggleFavouritesStatusForMovie(GlobalScope, selectedMovie)
         }
     }
 

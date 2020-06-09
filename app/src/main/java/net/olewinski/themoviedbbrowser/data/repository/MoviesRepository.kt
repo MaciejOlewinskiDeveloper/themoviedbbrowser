@@ -5,6 +5,7 @@ import androidx.lifecycle.Transformations
 import androidx.paging.toLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.olewinski.themoviedbbrowser.cloud.service.TmdbService
 import net.olewinski.themoviedbbrowser.data.PagedDataContainer
@@ -19,6 +20,12 @@ import javax.inject.Inject
 
 private const val DEFAULT_PAGE_SIZE_ITEMS = 32
 
+/**
+ * Main movies' repository, app's component as described in https://developer.android.com/jetpack/docs/guide
+ *
+ * @param tmdbService               TMDB's REST web service accessor
+ * @param theMovieDbBrowserDatabase Local database
+ */
 @ApplicationScope
 class MoviesRepository @Inject constructor(
     private val tmdbService: TmdbService,
@@ -28,10 +35,29 @@ class MoviesRepository @Inject constructor(
         private val LOG_TAG = MoviesRepository::class.java.simpleName
     }
 
-    suspend fun toggleFavouriteData(movieData: MovieData) {
-        theMovieDbBrowserDatabase.getFavouritesDao().toggleFavouritesStatusForMovie(movieData.id)
-    }
+    /**
+     * Changes current favourite status for given movie.
+     *
+     * @param coroutineScope    The scope of coroutine (please check [CoroutineScope] documentation)
+     *                          in which current favourite status should be changed.
+     * @param movieData         Movie that should have favourite status changed.
+     */
+    fun toggleFavouritesStatusForMovie(coroutineScope: CoroutineScope, movieData: MovieData) =
+        coroutineScope.launch {
+            theMovieDbBrowserDatabase.getFavouritesDao()
+                .toggleFavouritesStatusForMovie(movieData.id)
+        }
 
+    /**
+     * Returns [PagedDataContainer] representing paged list of movies returned by TMDB's "Now
+     * Playing" API together with data loading status metadata.
+     *
+     * @param coroutineScope    The scope of coroutine (please check [CoroutineScope] documentation)
+     *                          in which data fetching operation should be run.
+     *
+     * @return                  [PagedDataContainer] with "Now Playing" movies with data loading
+     *                          status metadata.
+     */
     fun getNowPlayingData(coroutineScope: CoroutineScope) = getPagedDataContainer(
         NowPlayingDataSourceFactory(
             tmdbService,
@@ -40,6 +66,17 @@ class MoviesRepository @Inject constructor(
         )
     )
 
+    /**
+     * Returns [PagedDataContainer] representing paged list of movies returned by TMDB's "Search"
+     * API for given query, together with data loading status metadata.
+     *
+     * @param coroutineScope    The scope of coroutine (please check [CoroutineScope] documentation)
+     *                          in which data fetching operation should be run.
+     * @param searchQuery       Query to search movies against.
+     *
+     * @return                  [PagedDataContainer] with "Now Playing" movies with data loading
+     *                          status metadata.
+     */
     fun searchMovies(coroutineScope: CoroutineScope, searchQuery: String) = getPagedDataContainer(
         SearchMoviesDataSourceFactory(
             tmdbService,
@@ -49,6 +86,13 @@ class MoviesRepository @Inject constructor(
         )
     )
 
+    /**
+     * Returns search suggestions for given search query.
+     *
+     * @param searchQuery   Query to fetch search suggestions for.
+     *
+     * @return              [List] of search suggestions for given query.
+     */
     suspend fun getMoviesSearchSuggestions(searchQuery: String): List<String> {
         try {
             val response = tmdbService.searchMovies(
@@ -62,6 +106,7 @@ class MoviesRepository @Inject constructor(
                 val results = response.body()?.results ?: emptyList()
                 val autocompleteData = mutableListOf<String>()
 
+                // Moving list operations to computation thread
                 return withContext(Dispatchers.Default) {
                     for (result in results) {
                         autocompleteData.add(result.title)
@@ -77,11 +122,14 @@ class MoviesRepository @Inject constructor(
         return emptyList()
     }
 
+    /**
+     * Helper method for creating [PagedDataContainer] from movies data requested by [BaseMoviesListDataSourceFactory].
+     */
     private fun getPagedDataContainer(moviesListDataSourceFactory: BaseMoviesListDataSourceFactory<*>) =
         PagedDataContainer(
             pagedData = moviesListDataSourceFactory.toLiveData(DEFAULT_PAGE_SIZE_ITEMS),
-            state = Transformations.switchMap(moviesListDataSourceFactory.moviesListDataSource) { searchMoviesDataSource ->
-                searchMoviesDataSource.networkDataLoadingState
+            state = Transformations.switchMap(moviesListDataSourceFactory.moviesListDataSource) { dataSource ->
+                dataSource.networkDataLoadingState
             },
             retryOperation = {
                 moviesListDataSourceFactory.moviesListDataSource.value?.retryAllFailed()
@@ -89,8 +137,8 @@ class MoviesRepository @Inject constructor(
             refreshDataOperation = {
                 moviesListDataSourceFactory.moviesListDataSource.value?.invalidate()
             },
-            refreshState = Transformations.switchMap(moviesListDataSourceFactory.moviesListDataSource) { searchMoviesDataSource ->
-                searchMoviesDataSource.initialNetworkDataLoadingState
+            refreshState = Transformations.switchMap(moviesListDataSourceFactory.moviesListDataSource) { dataSource ->
+                dataSource.initialNetworkDataLoadingState
             }
         )
 }
