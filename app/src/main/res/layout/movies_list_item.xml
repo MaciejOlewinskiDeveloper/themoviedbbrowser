@@ -16,10 +16,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/poster"
-            android:layout_width="64dp"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/movies_list_item_poster_preferred_width"
+            android:layout_height="@dimen/movies_list_item_poster_preferred_height"
             android:padding="8dp"
             android:contentDescription="@string/poster_content_description"
             app:layout_constraintBottom_toBottomOf="parent"

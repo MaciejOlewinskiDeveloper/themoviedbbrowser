@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.facebook.drawee.backends.pipeline.Fresco
 import net.olewinski.themoviedbbrowser.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -20,6 +21,8 @@ class MainActivity : AppCompatActivity() {
         navController = findNavController(R.id.main_navigation_nav_host)
 
         setupActionBarWithNavController(navController)
+
+        Fresco.initialize(this);
     }
 
     override fun onSupportNavigateUp() = navController.navigateUp() || super.onSupportNavigateUp()

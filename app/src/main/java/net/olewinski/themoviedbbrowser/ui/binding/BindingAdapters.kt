@@ -1,19 +1,14 @@
 package net.olewinski.themoviedbbrowser.ui.binding
 
-import android.widget.ImageView
+import android.net.Uri
 import androidx.databinding.BindingAdapter
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import net.olewinski.themoviedbbrowser.R
+import com.facebook.drawee.view.SimpleDraweeView
 
 /**
  * [BindingAdapter] for Android Data Binding library to handle loading images from URLs.
  */
-@BindingAdapter("imageUrl")
-fun loadFromUrlToImageView(view: ImageView, imageUrl: String) {
-    Glide.with(view.context)
-        .load(imageUrl)
-        .error(R.drawable.ic_image_placeholder_64dp)
-        .transition(DrawableTransitionOptions.withCrossFade())
-        .into(view)
+@BindingAdapter("app:imageUrl")
+fun loadFromUrlToSimpleDraweeView(view: SimpleDraweeView, imageUrl: String) {
+    view.setImageURI(Uri.parse(imageUrl), null)
 }
+

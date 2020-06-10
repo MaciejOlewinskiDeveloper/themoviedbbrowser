@@ -16,8 +16,8 @@ buildscript {
         // Retrofit version
         retrofit_version = '2.6.4'
         logging_interceptor_version = '3.12.0'
-        glide_version = '4.11.0'
         room_version = '2.2.5'
+        fresco_version = '1.10.0'
     }
 
     repositories {

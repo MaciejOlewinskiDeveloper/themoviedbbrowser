@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="movies_list_item_poster_preferred_width">64dp</dimen>
+    <dimen name="movies_list_item_poster_preferred_height">96dp</dimen>
+
+    <dimen name="movie_details_backdrop_preferred_height">256dp</dimen>
+</resources>
