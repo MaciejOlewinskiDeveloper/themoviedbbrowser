@@ -55,7 +55,7 @@ class TmdbServiceModule {
 
                 sc.init(null, null, null)
 
-                okHttpClientBuilder.sslSocketFactory(Tls12SocketFactory(sc.getSocketFactory()))
+                okHttpClientBuilder.sslSocketFactory(Tls12SocketFactory(sc.socketFactory))
 
                 val cs = ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
                     .tlsVersions(TlsVersion.TLS_1_2).build()

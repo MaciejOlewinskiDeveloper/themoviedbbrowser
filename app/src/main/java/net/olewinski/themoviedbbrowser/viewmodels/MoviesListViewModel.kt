@@ -161,7 +161,7 @@ class MoviesListViewModel(private val moviesRepository: MoviesRepository) : View
     /**
      * Handles clicking favourite toggle for movie.
      *
-     * @param movieData [MovieData] which favourite toggle was cliked.
+     * @param movieData [MovieData] which favourite toggle was clicked.
      */
     fun onItemFavouriteToggleClicked(movieData: MovieData) {
         moviesRepository.toggleFavouritesStatusForMovie(GlobalScope, movieData)
