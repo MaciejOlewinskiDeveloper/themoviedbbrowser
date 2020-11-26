@@ -8,7 +8,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.CursorAdapter
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,31 +27,21 @@ import net.olewinski.themoviedbbrowser.viewmodels.SelectedMovieViewModel
  */
 class MoviesListFragment : Fragment() {
 
+    private val moviesListViewModel: MoviesListViewModel by viewModels {
+        (requireContext().applicationContext as TheMovieDbBrowserApplication).applicationComponent.getMoviesListViewModelFactory()
+    }
+
+    private val selectedMovieViewModel: SelectedMovieViewModel by activityViewModels {
+        (requireContext().applicationContext as TheMovieDbBrowserApplication).applicationComponent.getSelectedMovieViewModelFactory()
+    }
+
     private lateinit var moviesListBinding: FragmentMoviesListBinding
     private lateinit var moviesListAdapter: MoviesListAdapter
-
-    private lateinit var moviesListViewModel: MoviesListViewModel
-    private lateinit var selectedMovieViewModel: SelectedMovieViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setHasOptionsMenu(true)
-
-        activity?.let { activity ->
-            val applicationComponent =
-                (activity.applicationContext as TheMovieDbBrowserApplication).applicationComponent
-
-            moviesListViewModel = ViewModelProvider(
-                viewModelStore,
-                applicationComponent.getMoviesListViewModelFactory()
-            ).get(MoviesListViewModel::class.java)
-
-            selectedMovieViewModel = ViewModelProvider(
-                activity.viewModelStore,
-                applicationComponent.getSelectedMovieViewModelFactory()
-            ).get(SelectedMovieViewModel::class.java)
-        } ?: throw RuntimeException("Lack of Activity!")
     }
 
     override fun onCreateView(
