@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProvider
 import net.olewinski.themoviedbbrowser.R
@@ -37,7 +36,7 @@ class MovieDetailsFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         movieDetailsBinding = FragmentMovieDetailsBinding.inflate(inflater, container, false)
         movieDetailsBinding.lifecycleOwner = viewLifecycleOwner
 
@@ -47,7 +46,7 @@ class MovieDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        selectedMovieViewModel.selectedMovie.observe(viewLifecycleOwner, Observer { movie ->
+        selectedMovieViewModel.selectedMovie.observe(viewLifecycleOwner, { movie ->
             movieDetailsBinding.item = movie
 
             (requireActivity() as AppCompatActivity).supportActionBar?.title = movie.title
@@ -61,7 +60,7 @@ class MovieDetailsFragment : Fragment() {
 
         Transformations.switchMap(selectedMovieViewModel.selectedMovie) { selectedMovie ->
             selectedMovie.favouriteStatus
-        }.observe(viewLifecycleOwner, Observer { isFavourite ->
+        }.observe(viewLifecycleOwner, { isFavourite ->
             // Menu items don't support data binding yet, we need to change icon in old way
             favouriteStatusMenuItem.setIcon(if (isFavourite) R.drawable.ic_toolbar_favourite_enabled_24 else R.drawable.ic_toolbar_favourite_disabled_24)
             favouriteStatusMenuItem.setTitle(if (isFavourite) R.string.favourite_menu_item_disable_label else R.string.favourite_menu_item_enable_label)

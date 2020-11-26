@@ -5,10 +5,13 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.provider.BaseColumns
 import androidx.lifecycle.*
+import androidx.paging.PagedList
 import kotlinx.coroutines.*
+import net.olewinski.themoviedbbrowser.cloud.DataLoadingState
 import net.olewinski.themoviedbbrowser.data.models.MovieData
 import net.olewinski.themoviedbbrowser.data.repository.MoviesRepository
 import net.olewinski.themoviedbbrowser.util.OneTimeEvent
+import javax.inject.Inject
 
 const val AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD = 2
 
@@ -33,12 +36,14 @@ class MovieDetailsNavigationRequest(val movieData: MovieData) : NavigationReques
 class MoviesListViewModel(private val moviesRepository: MoviesRepository) : ViewModel() {
 
     private val mutableNavigationRequest = MutableLiveData<OneTimeEvent<NavigationRequest>>()
+
     /**
      * Observable navigation request.
      */
     val navigationRequest: LiveData<OneTimeEvent<NavigationRequest>> = mutableNavigationRequest
 
     private val mutableSearchSuggestions = MutableLiveData<Cursor>()
+
     /**
      * Observable search suggestions.
      */
@@ -66,21 +71,22 @@ class MoviesListViewModel(private val moviesRepository: MoviesRepository) : View
     /**
      * Movies list data.
      */
-    val pagedMoviesData = Transformations.switchMap(moviesData) { value ->
-        value.pagedData
-    }
+    val pagedMoviesData: LiveData<PagedList<MovieData>> =
+        Transformations.switchMap(moviesData) { value ->
+            value.pagedData
+        }
 
     /**
      * Network data loading state for non-initial loading.
      */
-    val networkState = Transformations.switchMap(moviesData) { value ->
+    val networkState: LiveData<DataLoadingState> = Transformations.switchMap(moviesData) { value ->
         value.state
     }
 
     /**
      * Network data loading state for initial loading (refreshing).
      */
-    val refreshState = Transformations.switchMap(moviesData) { value ->
+    val refreshState: LiveData<DataLoadingState> = Transformations.switchMap(moviesData) { value ->
         value.refreshState
     }
 
@@ -174,7 +180,8 @@ class MoviesListViewModel(private val moviesRepository: MoviesRepository) : View
         moviesData.value?.retryOperation?.invoke()
     }
 
-    class Factory(private val moviesRepository: MoviesRepository) : ViewModelProvider.NewInstanceFactory() {
+    class Factory @Inject constructor(private val moviesRepository: MoviesRepository) :
+        ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(MoviesListViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")

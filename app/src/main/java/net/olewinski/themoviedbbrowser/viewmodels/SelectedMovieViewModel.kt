@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.GlobalScope
 import net.olewinski.themoviedbbrowser.data.models.MovieData
 import net.olewinski.themoviedbbrowser.data.repository.MoviesRepository
+import javax.inject.Inject
 
 /**
  * View model for passing information between screens about movie selected for showing details.
@@ -39,7 +40,7 @@ class SelectedMovieViewModel(private val moviesRepository: MoviesRepository) : V
         }
     }
 
-    class Factory(private val moviesRepository: MoviesRepository) : ViewModelProvider.NewInstanceFactory() {
+    class Factory @Inject constructor(private val moviesRepository: MoviesRepository) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SelectedMovieViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
