@@ -3,11 +3,9 @@ package net.olewinski.themoviedbbrowser.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.GlobalScope
 import net.olewinski.themoviedbbrowser.data.models.MovieData
 import net.olewinski.themoviedbbrowser.data.repository.MoviesRepository
-import javax.inject.Inject
 
 /**
  * View model for passing information between screens about movie selected for showing details.
@@ -17,6 +15,7 @@ import javax.inject.Inject
 class SelectedMovieViewModel(private val moviesRepository: MoviesRepository) : ViewModel() {
 
     private val mutableSelectedMovie = MutableLiveData<MovieData>()
+
     /**
      * Observable selected movie.
      */
@@ -37,17 +36,6 @@ class SelectedMovieViewModel(private val moviesRepository: MoviesRepository) : V
     fun onItemFavouriteToggleClicked() {
         selectedMovie.value?.let { selectedMovie ->
             moviesRepository.toggleFavouritesStatusForMovie(GlobalScope, selectedMovie)
-        }
-    }
-
-    class Factory @Inject constructor(private val moviesRepository: MoviesRepository) : ViewModelProvider.NewInstanceFactory() {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(SelectedMovieViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return SelectedMovieViewModel(moviesRepository) as T
-            } else {
-                throw Error("Incorrect ViewModel requested: only SelectedMovieViewModel can be provided here")
-            }
         }
     }
 }

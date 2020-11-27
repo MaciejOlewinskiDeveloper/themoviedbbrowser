@@ -4,21 +4,18 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Transformations
 import net.olewinski.themoviedbbrowser.R
-import net.olewinski.themoviedbbrowser.application.TheMovieDbBrowserApplication
 import net.olewinski.themoviedbbrowser.databinding.FragmentMovieDetailsBinding
 import net.olewinski.themoviedbbrowser.viewmodels.SelectedMovieViewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 /**
  * Screen with movie details.
  */
 class MovieDetailsFragment : Fragment() {
 
-    private val selectedMovieViewModel: SelectedMovieViewModel by activityViewModels {
-        (requireContext().applicationContext as TheMovieDbBrowserApplication).applicationComponent.getSelectedMovieViewModelFactory()
-    }
+    private val selectedMovieViewModel: SelectedMovieViewModel by sharedViewModel()
 
     private lateinit var movieDetailsBinding: FragmentMovieDetailsBinding
 

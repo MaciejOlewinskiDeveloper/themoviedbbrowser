@@ -11,7 +11,6 @@ import net.olewinski.themoviedbbrowser.cloud.DataLoadingState
 import net.olewinski.themoviedbbrowser.data.models.MovieData
 import net.olewinski.themoviedbbrowser.data.repository.MoviesRepository
 import net.olewinski.themoviedbbrowser.util.OneTimeEvent
-import javax.inject.Inject
 
 const val AUTOCOMPLETE_INPUT_LENGTH_MINIMUM_THRESHOLD = 2
 
@@ -178,17 +177,5 @@ class MoviesListViewModel(private val moviesRepository: MoviesRepository) : View
      */
     fun retry() {
         moviesData.value?.retryOperation?.invoke()
-    }
-
-    class Factory @Inject constructor(private val moviesRepository: MoviesRepository) :
-        ViewModelProvider.NewInstanceFactory() {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(MoviesListViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return MoviesListViewModel(moviesRepository) as T
-            } else {
-                throw Error("Incorrect ViewModel requested: only MoviesListViewModel can be provided here")
-            }
-        }
     }
 }

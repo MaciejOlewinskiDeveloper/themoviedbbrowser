@@ -8,32 +8,26 @@ import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.CursorAdapter
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import net.olewinski.themoviedbbrowser.R
-import net.olewinski.themoviedbbrowser.application.TheMovieDbBrowserApplication
 import net.olewinski.themoviedbbrowser.cloud.DataLoadingState
 import net.olewinski.themoviedbbrowser.databinding.FragmentMoviesListBinding
 import net.olewinski.themoviedbbrowser.ui.adapters.MoviesListAdapter
 import net.olewinski.themoviedbbrowser.viewmodels.MovieDetailsNavigationRequest
 import net.olewinski.themoviedbbrowser.viewmodels.MoviesListViewModel
 import net.olewinski.themoviedbbrowser.viewmodels.SelectedMovieViewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
+import org.koin.android.viewmodel.ext.android.viewModel
 
 /**
  * Movies list screen.
  */
 class MoviesListFragment : Fragment() {
 
-    private val moviesListViewModel: MoviesListViewModel by viewModels {
-        (requireContext().applicationContext as TheMovieDbBrowserApplication).applicationComponent.getMoviesListViewModelFactory()
-    }
-
-    private val selectedMovieViewModel: SelectedMovieViewModel by activityViewModels {
-        (requireContext().applicationContext as TheMovieDbBrowserApplication).applicationComponent.getSelectedMovieViewModelFactory()
-    }
+    private val moviesListViewModel: MoviesListViewModel by viewModel()
+    private val selectedMovieViewModel: SelectedMovieViewModel by sharedViewModel()
 
     private lateinit var moviesListBinding: FragmentMoviesListBinding
     private lateinit var moviesListAdapter: MoviesListAdapter

@@ -14,9 +14,7 @@ import net.olewinski.themoviedbbrowser.data.models.MovieData
 import net.olewinski.themoviedbbrowser.data.sources.NowPlayingDataSourceFactory
 import net.olewinski.themoviedbbrowser.data.sources.SearchMoviesDataSourceFactory
 import net.olewinski.themoviedbbrowser.data.sources.base.BaseMoviesListDataSourceFactory
-import net.olewinski.themoviedbbrowser.di.scopes.ApplicationScope
 import java.util.*
-import javax.inject.Inject
 
 private const val DEFAULT_PAGE_SIZE_ITEMS = 32
 
@@ -26,8 +24,7 @@ private const val DEFAULT_PAGE_SIZE_ITEMS = 32
  * @param tmdbService               TMDB's REST web service accessor
  * @param theMovieDbBrowserDatabase Local database
  */
-@ApplicationScope
-class MoviesRepository @Inject constructor(
+class MoviesRepository(
     private val tmdbService: TmdbService,
     private val theMovieDbBrowserDatabase: TheMovieDbBrowserDatabase
 ) {

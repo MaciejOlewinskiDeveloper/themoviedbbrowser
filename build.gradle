@@ -3,7 +3,7 @@ buildscript {
         kotlin_version = '1.4.20'
         navigation_version = '2.3.1'
         paging_version = '2.1.2'
-        dagger_version = '2.30.1'
+        koin_version = '2.2.1'
         gson_version = '2.8.6'
         // Not the newest version of Retrofit, since everything above 2.6.4 is only compatible with
         // Android > 5 and we wanted to be also compatible with 4.4 (KitKat). It's possible to fix
