@@ -12,7 +12,7 @@ import net.olewinski.themoviedbbrowser.cloud.DataLoadingState
  *
  * Differentiation between initial and non-initial data loading state might be useful e.g. for UI.
  */
-data class PagedDataContainer<T>(
+data class PagedDataContainer<T : Any>(
     /**
      * Observable paged data.
      */
