@@ -59,8 +59,8 @@ dependencies {
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
 
     // Koin
-    implementation "org.koin:koin-android-viewmodel:$koin_version"
-    implementation "org.koin:koin-android:$koin_version"
+    implementation "io.insert-koin:koin-android-viewmodel:$koin_version"
+    implementation "io.insert-koin:koin-android:$koin_version"
 
     // GSON
     implementation "com.google.code.gson:gson:$gson_version"
